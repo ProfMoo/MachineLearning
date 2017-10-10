@@ -4,13 +4,16 @@ import random
 
 numDataPoints = 10
 
-def plotLine(m, b, x):
-	ax.plot(x, x*m+b, 'r')
+def plotLine(m, b, x, color):
+	if (color == 0):
+		ax.plot(x, x*m+b, 'r')
+	if (color == 1):
+		ax.plot(x, x*m+b, 'g')
 
 def plotLines(MsBs, x):
 	i = 0
 	while (i < numDataPoints):
-		plotLine(MsBs[0][i], MsBs[1][i], x)
+		plotLine(MsBs[0][i], MsBs[1][i], x, 0)
 		i += 1
 
 def singleNum():
@@ -45,6 +48,17 @@ def getMBs(dataSet):
 
 	return (Ms, Bs)
 
+def getGbar(MsBs):
+	i = 0
+	addMs = 0
+	addBs = 0
+	while (i < numDataPoints):
+		addMs += MsBs[0][i]
+		addBs += MsBs[1][i]
+		i += 1
+
+	return(addMs/numDataPoints, addBs/numDataPoints)
+
 
 if __name__ == "__main__":
 	neg1to1 = np.arange(-1., 1., 0.05)
@@ -53,12 +67,15 @@ if __name__ == "__main__":
 	ax.plot(neg1to1, neg1to1*neg1to1, 'b')
 
 	dataSet = generatePoints()
-	print(dataSet)
+	print("dataSet: ", dataSet)
 
 	MsBs = getMBs(dataSet)
-	print(MsBs)
+	print("MsBs: ", MsBs)
 
 	plotLines(MsBs, neg1to1)
+
+	Gbar = getGbar(MsBs)
+	plotLine(Gbar[0], Gbar[1], neg1to1, 1)
 
 	##plotLine(2, 1, neg1to1)
 	ax.set_aspect('equal')
