@@ -4,11 +4,26 @@ import matplotlib
 
 import matplotlib.pyplot as plt
 from random import randint
+import random
 
-w = [-1, 0, 0]
+w = [-1, 1, 1]
 
 def formula(x):
+	print("w: ", w)
 	return ((-w[1]*x)/w[2])-(w[0]/w[2])
+
+def formula2(w2, x):
+	return 
+
+def cart2pol(x, y):
+	rho = numpy.sqrt(x**2 + y**2)
+	theta = numpy.arctan2(y, x)
+	return[rho, theta]
+
+def pol2cart(rho, theta):
+	x = rho * numpy.cos(theta)
+	y = rho * numpy.sin(theta)
+	return[x, y]
 
 def plot(data, h):
 	i = 0
@@ -17,15 +32,15 @@ def plot(data, h):
 	bx = []
 	by = []
 
-	print("data: ", data)
+	#print("data: ", data)
 
 	while (i < len(data)):
 		if (h[i] == -1):
-			bx.append(data[i][0])
-			by.append(data[i][1])
+			bx.append(data[i][1])
+			by.append(data[i][2])
 		elif (h[i] == 1):
-			rx.append(data[i][0])
-			ry.append(data[i][1])
+			rx.append(data[i][1])
+			ry.append(data[i][2])
 		i += 1	
 
 	lx = numpy.linspace(0,upperBound,2000)
@@ -34,16 +49,13 @@ def plot(data, h):
 	gy = formula(gx)
 	plt.plot(gx, gy)
 
-	plt.plot(lx, lx)
 	plt.plot(rx, ry, 'ro')
 	plt.plot(bx, by, 'bx')
 	plt.axis([0,upperBound,0,upperBound])
 	plt.show()
 
-
 def checkBad(k, data, h):
 	insideSign = w[0]*1+w[1]*data[k][0]+w[2]*data[k][1]
-	print("insideSign: ", insideSign)
 	if (insideSign > 0 and h[k] > 0):
 		return True
 	elif (insideSign > 0 and h[k] < 0):
@@ -52,7 +64,6 @@ def checkBad(k, data, h):
 		return True
 	elif (insideSign < 0 and h[k] > 0):
 		return False
-	#print("wut")
 
 def updateWeights(k, data, h):
 	#print("wpre: ", w)
@@ -65,28 +76,48 @@ def updateWeights(k, data, h):
 		j += 1
 	#print("wafter: ", w)
 
-def makeData(data):
+def makeDataCircles(data):
 	i = 0
 	while (i < numPoints):
-		x1pre = randint(0,upperBound)
-		x2pre = randint(0,upperBound)
-		if (x1pre == x2pre):
-			continue
-		elif (x1pre > x2pre):
-			blue.append(x1pre)
-			blue.append(x2pre)
+		blueorred = random.randrange(-1,2,2)
+		if (blueorred == -1):
+			theta = random.uniform(0,180)
+			rho = random.uniform(10,15)
+			location = pol2cart(rho, theta)
+			print("location: ", location)
+			location[0] += 17.5
+			if (location[1] < 0):
+				location[1] = -(location[1])
+			location[1] += 27.5
+			blue.append(location[0])
+			blue.append(location[1])
 			data.append(list(blue))
 			blue.clear()
 			h.append(-1)
-		else:
-			red.append(x1pre)
-			red.append(x2pre)
+		elif (blueorred == 1):
+			theta = random.uniform(180,360)
+			rho = random.uniform(10,15)
+			location = pol2cart(rho, theta)
+			location[0] += 30
+			if (location[1] > 0):
+				location[1] = -(location[1])
+			location[1] += 22.5
+			red.append(location[0])
+			red.append(location[1])
 			data.append(list(red))
 			red.clear()
 			h.append(1)
 		i += 1
-	print(h)
 	return h
+
+def fixData(data2):
+	i = 0
+	while (i < len(data2)):
+		data[i].insert(0, 1)
+		i += 1
+
+	print("data2: ", data2)
+	return data2
 
 def runSimulation(h ,data):
 	numIter = 0
@@ -119,11 +150,27 @@ if __name__ == "__main__":
 	blue = []
 	h = []
 
-	numPoints = 20
-	upperBound = 100
+	numPoints = 10
+	upperBound = 50
 
-	h = makeData(data)
+	h = makeDataCircles(data)
+	#print("data:", data)
+	#print("h: ", h2)
 
 	runSimulation(h, data)
+	#print("data:", data)
+
+	#regression: 3.1b
+	data2 = []
+	data2 = fixData(data)
+	x_matrix = numpy.matrix(data2)
+
+	#h_fix = fixh(h)
+	y_matrix = numpy.matrix(h)
+	print("x_matrix: ", x_matrix)
+	print("y_matrix: ", y_matrix)
+	wlin = (numpy.linalg.inv(numpy.transpose(x_matrix) * x_matrix) * numpy.transpose(x_matrix)) * numpy.transpose(y_matrix)
+	print("wlin: ", wlin)
+	#w2 = 
 
 	plot(data, h)
