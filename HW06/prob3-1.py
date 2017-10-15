@@ -51,8 +51,8 @@ def plot(data, h, type):
 		gy = formula(gx)
 		plt.plot(gx, gy)
 
-		plt.plot(rx, ry, 'ro')
-		plt.plot(bx, by, 'bx')
+		plt.plot(rx, ry, 'bo')
+		plt.plot(bx, by, 'rx')
 		plt.axis([0,upperBound,0,upperBound])
 		plt.show()
 
