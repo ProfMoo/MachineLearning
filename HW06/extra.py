@@ -21,17 +21,21 @@ def getSymmetry(trainingDigit):
 	while (i < 8): #get symmetry across vertical axis
 		j = 0
 		while (j < 16):
-			xsymmetry += abs(float(trainingDigit[j*16+1]) - float(trainingDigit[(j+1)*16 - (i + 1)]))
+			pointOne = float(trainingDigit[j*16+1])
+			pointTwo = float(trainingDigit[(j+1)*16 - (i + 1)])
+			xsymmetry += abs(pointOne - pointTwo)
 			j += 1
 		i += 1
 	i = 0
 	while (i < 16): #get symmetry across horizontal axis
 		j = 0
 		while (j < 8):
-			ysymmetry += abs(float(trainingDigit[j*16+1]) - float(trainingDigit[(15-j)*16-i]))
+			pointOne = float(trainingDigit[j*16+1])
+			pointTwo = float(trainingDigit[(15-j)*16-i])
+			ysymmetry += abs(pointOne - pointTwo)
 			j += 1
 		i += 1
-	return (xsymmetry+ysymmetry)
+	return (xsymmetry+ysymmetry)/256.
 
 # def getData(data, trainingDigits):
 # 	i = 0
@@ -45,7 +49,7 @@ def getSymmetry(trainingDigit):
 # 		i += 1
 
 if __name__ == "__main__":
-	f = open("ZipDigits.train", 'r')
+	f = open("ZipDigits.test", 'r')
 
 	x1 = []
 	y1 = []
@@ -68,6 +72,6 @@ if __name__ == "__main__":
 	plt.plot(x5, y5, 'rx')
 	plt.plot(x1, y1, 'bo')
 	fig.suptitle('digits', fontsize = 20)
-	plt.xlabel('symmetry', fontsize = 18)
+	plt.xlabel('asymmetry', fontsize = 18)
 	plt.ylabel('intensity', fontsize = 16)
 	plt.show()
