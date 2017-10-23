@@ -110,7 +110,7 @@ def plotwlin(wother, which, whichFile):
 		print("wslope: ", wslope)
 		print("wyint: ", wyint)
 		if (whichFile == "test"):
-			gx = numpy.array(range(90, 98))
+			gx = numpy.array(range(94, 103))
 		if (whichFile == "train"):
 			gx = numpy.array(range(95, 108))
 		gy = formula2(gx, wslope, wyint)
@@ -200,8 +200,8 @@ def EinCalc(data, h, wtotest):
 	return (wtotestbad/len(data))
 
 if __name__ == "__main__":
-	f = open("ZipDigits.train", 'r')
-	whichFile = "train"
+	f = open("ZipDigits.test", 'r')
+	whichFile = "test"
 
 	pocketTop = 1000
 	x1 = []
@@ -229,20 +229,21 @@ if __name__ == "__main__":
 	ys = getYs(x1, x5)
 
 	#get wlin
-	x_matrix = numpy.matrix(data)
-	y_matrix = numpy.matrix(ys)
-	print("x_matrix: ", x_matrix)
-	print("y_matrix: ", y_matrix)
-	x_matrix_trans = numpy.transpose(x_matrix)
-	wlin = (numpy.linalg.inv(x_matrix_trans * x_matrix) * x_matrix_trans) * numpy.transpose(y_matrix)
-	print("wlin: ", wlin)
+	# x_matrix = numpy.matrix(data)
+	# y_matrix = numpy.matrix(ys)
+	# print("x_matrix: ", x_matrix)
+	# print("y_matrix: ", y_matrix)
+	# x_matrix_trans = numpy.transpose(x_matrix)
+	# wlin = (numpy.linalg.inv(x_matrix_trans * x_matrix) * x_matrix_trans) * numpy.transpose(y_matrix)
+	# print("wlin: ", wlin)
 
-	w[0] = wlin[0].item(0,0)
-	w[1] = wlin[1].item(0,0)
-	w[2] = wlin[2].item(0,0)
+	# w[0] = wlin[0].item(0,0)
+	# w[1] = wlin[1].item(0,0)
+	# w[2] = wlin[2].item(0,0)
 
-	wbest = runSimulation(ys, data2)
+	# wbest = runSimulation(ys, data2)
 
+	wbest = [320.645, -3.384, 34.6975]
 	#now, plot
 	fig = plt.figure()
 	plt.plot(x5, y5, 'rx')
@@ -252,8 +253,7 @@ if __name__ == "__main__":
 	print("wbest: ", wbest)
 	Ein = EinCalc(data2, ys, wbest)
 	print("Ein: ", Ein)
-
-	plotwlin(wlin, 0, whichFile)
+	
 	plotwlin(wbest, 1, whichFile)
 
 	fig.suptitle('digits', fontsize = 20)

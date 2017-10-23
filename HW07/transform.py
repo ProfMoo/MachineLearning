@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from random import randint
 import random
 
-w = [-1,1,1]
+w = [-1,1,1,1,1,1,1,1,1,1]
 
 def getIntensity(trainingDigit):
 	intensity = 0
@@ -39,26 +39,38 @@ def getSymmetry(trainingDigit):
 		i += 1
 	return (xsymmetry+ysymmetry)
 
-def getData(x1, y1, x5, y5, one):
+def getData(x1, y1, x5, y5):
 	databack = []
 	singledata = []
 	i = 0
 	while (i < len(x1)):
 		singledata = []
-		if (one == 1):
-			singledata.append(1)
+		singledata.append(1)
 		singledata.append(x1[i])
 		singledata.append(y1[i])
+		singledata.append(x1[i]**2)
+		singledata.append(x1[i]*y1[i])
+		singledata.append(y1[i]**2)
+		singledata.append(x1[i]**3)
+		singledata.append((x1[i]**2)*y1[i])
+		singledata.append(x1[i]*(y1[i]**2))
+		singledata.append(y1[i]**3)
 		databack.append(singledata)
 		i += 1
 
 	i = 0
 	while (i < len(x5)):
 		singledata = []
-		if (one == 1):
-			singledata.append(1)
+		singledata.append(1)
 		singledata.append(x5[i])
 		singledata.append(y5[i])
+		singledata.append(x5[i]**2)
+		singledata.append(x5[i]*y5[i])
+		singledata.append(y5[i]**2)
+		singledata.append(x5[i]**3)
+		singledata.append((x5[i]**2)*y5[i])
+		singledata.append(x5[i]*(y5[i]**2))
+		singledata.append(y5[i]**3)
 		databack.append(singledata)
 		i += 1
 
@@ -80,44 +92,13 @@ def getYs(x1, x5):
 def formula2(x, wslope, wyint):
 	return (x*wslope + wyint)
 
-def plotwlin(wother, which, whichFile):
-
-	print("wother:", wother)
-
-	'''
-		used for testing data
-		gx = numpy.array(range(105, 113))
-		gx = numpy.array(range(90, 97))
-	'''
-
-
-	if (which == 0):
-		wslope = -1.0*wother[1][0]/wother[2][0]
-		wyint = -1.0*wother[0][0]/wother[2][0]
-		wslope = wslope.item(0,0)
-		wyint = wyint.item(0,0)
-		print("wslope: ", wslope)
-		print("wyint: ", wyint)
-		if (whichFile == "test"):
-			gx = numpy.array(range(105, 113))
-		if (whichFile == "train"):
-			gx = numpy.array(range(97, 108))
-		gy = formula2(gx, wslope, wyint)
-		#plt.plot(gx, gy, 'r')
-	if (which == 1):
-		wslope = -1.0*wother[1]/wother[2]
-		wyint = -1.0*wother[0]/wother[2]
-		print("wslope: ", wslope)
-		print("wyint: ", wyint)
-		if (whichFile == "test"):
-			gx = numpy.array(range(90, 98))
-		if (whichFile == "train"):
-			gx = numpy.array(range(95, 108))
-		gy = formula2(gx, wslope, wyint)
-		plt.plot(gx, gy, 'b')
-
 def checkBad(k, data, h, wcheck):
-	insideSign = wcheck[0]*1+wcheck[1]*data[k][0]+wcheck[2]*data[k][1]
+	i = 0
+	insideSign = 0
+	while (i < len(wcheck)):
+		insideSign += wcheck[i]*data[k][i]
+		i += 1
+
 	if (insideSign > 0 and h[k] > 0):
 		return True
 	elif (insideSign > 0 and h[k] < 0):
@@ -149,18 +130,14 @@ def pocketCheck(wbest, data, h):
 def updateWeights(k, data, h):
 	#print("wpre: ", w)
 	j = 0
-	while (j < 3):
-		if (j == 0):
-			w[j] = w[j] + (h[k])
-		else:
-			w[j] = w[j] + (h[k]*data[k][j-1])
+	while (j < len(w)):
+		w[j] = w[j] + (h[k]*data[k][j])
 		j += 1
 
 def runSimulation(h, data):
 	numIter = 0
 	complete = False
 	wbest = w[:]
-	print("wbest(wlin right now): ", wbest)
 	while(complete == False and numIter < pocketTop): ##while iterations still need to be done
 		
 		if (numIter%100 == 0):
@@ -200,10 +177,10 @@ def EinCalc(data, h, wtotest):
 	return (wtotestbad/len(data))
 
 if __name__ == "__main__":
-	f = open("ZipDigits.train", 'r')
-	whichFile = "train"
+	f = open("ZipDigits.test", 'r')
+	whichFile = "test"
 
-	pocketTop = 1000
+	pocketTop = 10000
 	x1 = []
 	y1 = []
 	x5 = []
@@ -222,26 +199,30 @@ if __name__ == "__main__":
 
 	#make data with 1 in beginning
 	data = []
-	data2 = []
-	data = getData(x1, y1, x5, y5, 1)
-	data2 = getData(x1, y1, x5, y5, 0)
+	data = getData(x1, y1, x5, y5)
 	#print("data: ", data)
 	ys = getYs(x1, x5)
 
-	#get wlin
-	x_matrix = numpy.matrix(data)
-	y_matrix = numpy.matrix(ys)
-	print("x_matrix: ", x_matrix)
-	print("y_matrix: ", y_matrix)
-	x_matrix_trans = numpy.transpose(x_matrix)
-	wlin = (numpy.linalg.inv(x_matrix_trans * x_matrix) * x_matrix_trans) * numpy.transpose(y_matrix)
-	print("wlin: ", wlin)
+	if (whichFile == "train"):
+		#get wlin
+		x_matrix = numpy.matrix(data)
+		y_matrix = numpy.matrix(ys)
+		print("x_matrix: ", x_matrix)
+		print("y_matrix: ", y_matrix)
+		x_matrix_trans = numpy.transpose(x_matrix)
+		wlin = (numpy.linalg.inv(x_matrix_trans * x_matrix) * x_matrix_trans) * numpy.transpose(y_matrix)
+		print("wlin: ", wlin)
 
-	w[0] = wlin[0].item(0,0)
-	w[1] = wlin[1].item(0,0)
-	w[2] = wlin[2].item(0,0)
+		i = 0
+		while (i < len(w)):
+			w[i] = wlin[i].item(0,0)
+			i += 1
 
-	wbest = runSimulation(ys, data2)
+		wbest = runSimulation(ys, data)
+
+	#if training, put info here
+	if (whichFile == "test"):
+		wbest = [3900.9537672701117, 132444.29258090307, 945.3587626474431, 3956844.6179376612, 29690.858226053988, 224.39950620210197, -44418.04716501154, 391730.36874999397, 4700.622216805811, 35.357179584787836]
 
 	#now, plot
 	fig = plt.figure()
@@ -250,11 +231,9 @@ if __name__ == "__main__":
 
 	#calculate Ein
 	print("wbest: ", wbest)
-	Ein = EinCalc(data2, ys, wbest)
+	Ein = EinCalc(data, ys, wbest)
 	print("Ein: ", Ein)
-
-	plotwlin(wlin, 0, whichFile)
-	plotwlin(wbest, 1, whichFile)
+	
 
 	fig.suptitle('digits', fontsize = 20)
 	plt.xlabel('asymmetry', fontsize = 18)
