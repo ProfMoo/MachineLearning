@@ -200,8 +200,8 @@ def EinCalc(data, h, wtotest):
 	return (wtotestbad/len(data))
 
 if __name__ == "__main__":
-	f = open("ZipDigits.test", 'r')
-	whichFile = "test"
+	f = open("ZipDigits.train", 'r')
+	whichFile = "train"
 
 	pocketTop = 1000
 	x1 = []
