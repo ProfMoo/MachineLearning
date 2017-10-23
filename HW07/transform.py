@@ -222,18 +222,22 @@ if __name__ == "__main__":
 
 	#if training, put info here
 	if (whichFile == "test"):
-		wbest = [3900.9537672701117, 132444.29258090307, 945.3587626474431, 3956844.6179376612, 29690.858226053988, 224.39950620210197, -44418.04716501154, 391730.36874999397, 4700.622216805811, 35.357179584787836]
+		wbest = [3900.9537672701094, 132444.29258090307, 945.3587626474581, 3956844.6179376612, 29690.85822605399, 224.39950620190498, -44418.04716501154, 391730.36874999397, 4700.622216805807, 35.35717958521439]
+
+	x11 = numpy.linspace(0, 275, 250)
+	x22 = numpy.linspace(0, 1.25, 250)
+	x11, x22 = numpy.meshgrid(x11, x22)	
 
 	#now, plot
 	fig = plt.figure()
 	plt.plot(x5, y5, 'rx')
 	plt.plot(x1, y1, 'bo')
+	plt.contour(x11, x22, wbest[0] + wbest[1]*x11 + wbest[2]*x22 + wbest[3]*x11**2 + wbest[4]*x11*x22 + wbest[5]*x22**2 + wbest[6]*x11**3 + wbest[7]*x11**2*x22 + wbest[8]*x11*x22**2 + wbest[9]*x22**3, [0])
 
 	#calculate Ein
 	print("wbest: ", wbest)
 	Ein = EinCalc(data, ys, wbest)
 	print("Ein: ", Ein)
-	
 
 	fig.suptitle('digits', fontsize = 20)
 	plt.xlabel('asymmetry', fontsize = 18)
