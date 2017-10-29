@@ -184,6 +184,7 @@ if __name__ == "__main__":
 	#print("y_matrix: ", y_matrix)
 	wlin = (numpy.linalg.inv(numpy.transpose(x_matrix) * x_matrix) * numpy.transpose(x_matrix)) * numpy.transpose(y_matrix)
 	print("wlin: ", wlin)
+
 	wlinslope = -1.0*wlin[1][0]/wlin[2][0]
 	wlinyint = -1.0*wlin[0][0]/wlin[2][0]
 	wlinslope = wlinslope.item(0,0)
