@@ -7,12 +7,6 @@ from random import randint
 import random
 
 features = 45
-w = []
-w.append(-1)
-i = 0
-while (i < (features-1)):
-	w.append(1)
-	i += 1
 
 def normalizeFeatures(x1, y1, xN, yN):
 	minX = 10000
@@ -90,119 +84,23 @@ def getSymmetry(trainingDigit):
 		i += 1
 	return (xsymmetry+ysymmetry)
 
-def getData3(x1, y1, xN, yN):
-	databack = []
-	singledata = []
-	i = 0
-	while (i < len(x1)):
-		singledata = []
-		singledata.append(1)
-		singledata.append(x1[i])
-		singledata.append(y1[i])
-		singledata.append(x1[i]**2)
-		singledata.append(x1[i]*y1[i])
-		singledata.append(y1[i]**2)
-		singledata.append(x1[i]**3)
-		singledata.append((x1[i]**2)*y1[i])
-		singledata.append(x1[i]*(y1[i]**2))
-		singledata.append(y1[i]**3)
-		databack.append(singledata)
-		i += 1
-
-	i = 0
-	while (i < len(xN)):
-		singledata = []
-		singledata.append(1)
-		singledata.append(xN[i])
-		singledata.append(yN[i])
-		singledata.append(xN[i]**2)
-		singledata.append(xN[i]*yN[i])
-		singledata.append(yN[i]**2)
-		singledata.append(xN[i]**3)
-		singledata.append((xN[i]**2)*yN[i])
-		singledata.append(xN[i]*(yN[i]**2))
-		singledata.append(yN[i]**3)
-		databack.append(singledata)
-		i += 1
-
-	return databack
-
 def getData8L(x1, y1, xN, yN):
 	databack = []
 	singledata = []
-
-	# total = [1]
-	# prev = [1]
-	# toadd = []
-	# i = 0
-	# while (i < len(x1)):
-	# 	j = 0
-	# 	while (j < 3):
-	# 		k = 0
-	# 		while (k < len(prev)):
-	# 			toadd.append(prev[j]*lp(j+1, x1[i]))
-	# 			k += 1
-	# 		toadd.append(prev[-1]*lp())
-	# 		j += 1
-	# 	i += 1
+	polynum = 8
 
 	i = 0
 	while (i < len(x1)):
 		singledata = []
 		singledata.append(1)
-
-		singledata.append(lp(1, x1[i]))
-		singledata.append(lp(1, y1[i]))
-
-		singledata.append(lp(2, x1[i]))
-		singledata.append(lp(1, x1[i]) * lp(1, y1[i]))
-		singledata.append(lp(2, y1[i]))
-
-		singledata.append(lp(3, x1[i]))
-		singledata.append(lp(2, x1[i]) * lp(1, y1[i]))
-		singledata.append(lp(1, x1[i]) * lp(2, y1[i]))
-		singledata.append(lp(3, y1[i]))
-
-		singledata.append(lp(4, x1[i]))
-		singledata.append(lp(3, x1[i]) * lp(1, y1[i]))
-		singledata.append(lp(2, x1[i]) * lp(2, y1[i]))
-		singledata.append(lp(1, x1[i]) * lp(3, y1[i]))
-		singledata.append(lp(4, y1[i]))
-
-		singledata.append(lp(5, x1[i]))
-		singledata.append(lp(4, x1[i]) * lp(1, y1[i]))
-		singledata.append(lp(3, x1[i]) * lp(2, y1[i]))
-		singledata.append(lp(2, x1[i]) * lp(3, y1[i]))
-		singledata.append(lp(1, x1[i]) * lp(4, y1[i]))
-		singledata.append(lp(5, y1[i]))
-
-		singledata.append(lp(6, x1[i]))
-		singledata.append(lp(5, x1[i]) * lp(1, y1[i]))
-		singledata.append(lp(4, x1[i]) * lp(2, y1[i]))
-		singledata.append(lp(3, x1[i]) * lp(3, y1[i]))
-		singledata.append(lp(2, x1[i]) * lp(4, y1[i]))
-		singledata.append(lp(1, x1[i]) * lp(5, y1[i]))
-		singledata.append(lp(6, y1[i]))
-
-		singledata.append(lp(7, x1[i]))
-		singledata.append(lp(6, x1[i]) * lp(1, y1[i]))
-		singledata.append(lp(5, x1[i]) * lp(2, y1[i]))
-		singledata.append(lp(4, x1[i]) * lp(3, y1[i]))
-		singledata.append(lp(3, x1[i]) * lp(4, y1[i]))
-		singledata.append(lp(2, x1[i]) * lp(5, y1[i]))
-		singledata.append(lp(1, x1[i]) * lp(6, y1[i]))
-		singledata.append(lp(7, y1[i]))
-
-		singledata.append(lp(8, x1[i]))
-		singledata.append(lp(7, x1[i]) * lp(1, y1[i]))
-		singledata.append(lp(6, x1[i]) * lp(2, y1[i]))
-		singledata.append(lp(5, x1[i]) * lp(3, y1[i]))
-		singledata.append(lp(4, x1[i]) * lp(4, y1[i]))
-		singledata.append(lp(3, x1[i]) * lp(5, y1[i]))
-		singledata.append(lp(2, x1[i]) * lp(6, y1[i]))
-		singledata.append(lp(1, x1[i]) * lp(7, y1[i]))
-		singledata.append(lp(8, y1[i]))
-
+		j = 0
+		while (j < polynum):
+			k = j
+			while (k >= 0):
+				singledata.append(lp(k + 1, x1[i]) * lp((j - k), y1[i]))
+				k -= 1
+			singledata.append(lp((j + 1), y1[i]))
+			j += 1
 		databack.append(singledata)
 		i += 1
 
@@ -210,61 +108,18 @@ def getData8L(x1, y1, xN, yN):
 	while (i < len(xN)):
 		singledata = []
 		singledata.append(1)
-
-		singledata.append(lp(1, xN[i]))
-		singledata.append(lp(1, yN[i]))
-
-		singledata.append(lp(2, xN[i]))
-		singledata.append(lp(1, xN[i]) * lp(1, yN[i]))
-		singledata.append(lp(2, yN[i]))
-
-		singledata.append(lp(3, xN[i]))
-		singledata.append(lp(2, xN[i]) * lp(1, yN[i]))
-		singledata.append(lp(1, xN[i]) * lp(2, yN[i]))
-		singledata.append(lp(3, yN[i]))
-
-		singledata.append(lp(4, xN[i]))
-		singledata.append(lp(3, xN[i]) * lp(1, yN[i]))
-		singledata.append(lp(2, xN[i]) * lp(2, yN[i]))
-		singledata.append(lp(1, xN[i]) * lp(3, yN[i]))
-		singledata.append(lp(4, yN[i]))
-
-		singledata.append(lp(5, xN[i]))
-		singledata.append(lp(4, xN[i]) * lp(1, yN[i]))
-		singledata.append(lp(3, xN[i]) * lp(2, yN[i]))
-		singledata.append(lp(2, xN[i]) * lp(3, yN[i]))
-		singledata.append(lp(1, xN[i]) * lp(4, yN[i]))
-		singledata.append(lp(5, yN[i]))
-
-		singledata.append(lp(6, xN[i]))
-		singledata.append(lp(5, xN[i]) * lp(1, yN[i]))
-		singledata.append(lp(4, xN[i]) * lp(2, yN[i]))
-		singledata.append(lp(3, xN[i]) * lp(3, yN[i]))
-		singledata.append(lp(2, xN[i]) * lp(4, yN[i]))
-		singledata.append(lp(1, xN[i]) * lp(5, yN[i]))
-		singledata.append(lp(6, yN[i]))
-
-		singledata.append(lp(7, xN[i]))
-		singledata.append(lp(6, xN[i]) * lp(1, yN[i]))
-		singledata.append(lp(5, xN[i]) * lp(2, yN[i]))
-		singledata.append(lp(4, xN[i]) * lp(3, yN[i]))
-		singledata.append(lp(3, xN[i]) * lp(4, yN[i]))
-		singledata.append(lp(2, xN[i]) * lp(5, yN[i]))
-		singledata.append(lp(1, xN[i]) * lp(6, yN[i]))
-		singledata.append(lp(7, yN[i]))
-
-		singledata.append(lp(8, xN[i]))
-		singledata.append(lp(7, xN[i]) * lp(1, yN[i]))
-		singledata.append(lp(6, xN[i]) * lp(2, yN[i]))
-		singledata.append(lp(5, xN[i]) * lp(3, yN[i]))
-		singledata.append(lp(4, xN[i]) * lp(4, yN[i]))
-		singledata.append(lp(3, xN[i]) * lp(5, yN[i]))
-		singledata.append(lp(2, xN[i]) * lp(6, yN[i]))
-		singledata.append(lp(1, xN[i]) * lp(7, yN[i]))
-		singledata.append(lp(8, yN[i]))
-
+		j = 0
+		while (j < polynum):
+			k = j
+			while (k >= 0):
+				singledata.append(lp(k + 1, xN[i]) * lp((j - k), yN[i]))
+				k -= 1
+			singledata.append(lp((j + 1), yN[i]))
+			j += 1
 		databack.append(singledata)
 		i += 1
+
+	print("checking len(databack[0]): ", len(databack[0]))
 
 	return databack
 
@@ -280,34 +135,6 @@ def getYs(x1, xN):
 		i += 1
 
 	return ys
-
-def formula2(x, wslope, wyint):
-	return (x*wslope + wyint)
-
-def getWLin(data, ys):
-	x_matrix = numpy.matrix(data)
-	y_matrix = numpy.matrix(ys)
-
-	print("x_matrix: ", x_matrix)
-	print("y_matrix: ", y_matrix)
-
-	x_matrix_trans = numpy.transpose(x_matrix)
-	wlin = (numpy.linalg.inv(x_matrix_trans * x_matrix) * x_matrix_trans) * numpy.transpose(y_matrix)
-	
-	return wlin
-
-def getWReg(data, ys, lambdareg):
-	x_matrix = numpy.matrix(data)
-	y_matrix = numpy.matrix(ys)
-	N = len(data[0])
-
-	print("x_matrix: ", x_matrix)
-	print("y_matrix: ", y_matrix)
-	x_matrix_trans = numpy.transpose(x_matrix)
-	regulation = lambdareg*numpy.identity(N)
-	wreg = numpy.linalg.inv(x_matrix_trans * x_matrix + regulation) * x_matrix_trans * numpy.transpose(y_matrix)
-
-	return wreg
 
 def checkBad(k, data, h, wcheck):
 	i = 0
@@ -325,139 +152,48 @@ def checkBad(k, data, h, wcheck):
 	elif (insideSign < 0 and h[k] > 0):
 		return False
 
-def pocketCheck(wbest, data, h):
-	i = 0
-	wbestbad = 0
-	wbad = 0
-	while (i < len(data)):
-		if (checkBad(i, data, h, w) == False):
-			wbad += 1
-		if (checkBad(i, data, h, wbest) == False):
-			wbestbad += 1
-		i += 1
+def getWReg(data, ys, lambdareg):
+	x_matrix = numpy.matrix(data)
+	y_matrix = numpy.matrix(ys)
+	N = len(data[0])
 
-	if (wbad < wbestbad):
-		print("wbad: ", wbad)
-		print("wbestbad: ", wbestbad)
-		print("found better, replacing...")
-		print("w: ", w)
-		return True
-	return False
+	print("x_matrix: ", x_matrix)
+	print("y_matrix: ", y_matrix)
+	x_matrix_trans = numpy.transpose(x_matrix)
+	regulation = lambdareg*numpy.identity(N)
+	wreg = numpy.linalg.inv(x_matrix_trans * x_matrix + regulation) * x_matrix_trans * numpy.transpose(y_matrix)
 
-def updateWeights(k, data, h):
-	#print("wpre: ", w)
-	j = 0
-	while (j < len(w)):
-		w[j] = w[j] + (h[k]*data[k][j])
-		j += 1
-
-def runSimulation(h, data):
-	numIter = 0
-	complete = False
-	wbest = w[:]
-	while(complete == False and numIter < pocketTop): ##while iterations still need to be done
-		
-		if (numIter%100 == 0):
-			print("numIter: ", numIter)
-
-		#check for pocket algorithm
-		if(pocketCheck(wbest, data, h)):
-			wbest = w[:]
-
-		i = 0
-		checking = False
-		while (i < len(data)): ##looping through data
-			checking = checkBad(i, data, h, w)
-			if (checking == True):
-				if (i == len(data)-1): ##if you're done
-					complete = True
-					break
-				else:
-					i += 1
-					continue
-			elif (checking == False): ##if there is a wrong value
-				updateWeights(i, data, h)
-				break
-			i += 1
-		numIter += 1
-
-	return wbest
+	return wreg
 
 def EinCalc(data, h, wtotest):
 	i = 0
 	wtotestbad = 0
 	while (i < len(data)):
 		if (checkBad(i, data, h, wtotest) == False):
+			print("BAD")
 			wtotestbad += 1
 		i += 1
 
 	return (wtotestbad/len(data))
 
-def contourPlot(x1, y1, xN, yN, features):
-	x11 = numpy.linspace(-1.1, 1.1, 250)
-	x22 = numpy.linspace(-1.1, 1.1, 250)
+def contourPlot(x1, y1, xN, yN):
+	x11 = numpy.linspace(-1.5, 1.5, 250)
+	x22 = numpy.linspace(-1.5, 1.5, 250)
 	x11, x22 = numpy.meshgrid(x11, x22)	
 
 	#now, plot
-	if (features == 10):
-		plt.contour(x11, x22, wbest[0] + wbest[1]*x11 + wbest[2]*x22 + wbest[3]*x11**2 + wbest[4]*x11*x22 + wbest[5]*x22**2 + wbest[6]*x11**3 + wbest[7]*x11**2*x22 + wbest[8]*x11*x22**2 + wbest[9]*x22**3, [0])
-	if (features == 45):
-		plt.contour(x11, x22, wbest[0] + wbest[1]*x11 + wbest[2]*x22 + wbest[3]*x11**2 \
-		+ wbest[4]*x11*x22 + wbest[5]*x22**2 + wbest[6]*x11**3 + wbest[7]*x11**2*x22 + \
-		wbest[8]*x11*x22**2 + wbest[9]*x22**3, [0])
-
-		(lp(1, x1[i]))
-		(lp(1, y1[i]))
-
-		(lp(2, x1[i]))
-		(lp(1, x1[i]) * lp(1, y1[i]))
-		(lp(2, y1[i]))
-
-		(lp(3, x1[i]))
-		(lp(2, x1[i]) * lp(1, y1[i]))
-		(lp(1, x1[i]) * lp(2, y1[i]))
-		(lp(3, y1[i]))
-
-		(lp(4, x1[i]))
-		(lp(3, x1[i]) * lp(1, y1[i]))
-		(lp(2, x1[i]) * lp(2, y1[i]))
-		(lp(1, x1[i]) * lp(3, y1[i]))
-		(lp(4, y1[i]))
-
-		(lp(5, x1[i]))
-		(lp(4, x1[i]) * lp(1, y1[i]))
-		(lp(3, x1[i]) * lp(2, y1[i]))
-		(lp(2, x1[i]) * lp(3, y1[i]))
-		(lp(1, x1[i]) * lp(4, y1[i]))
-		(lp(5, y1[i]))
-
-		(lp(6, x1[i]))
-		(lp(5, x1[i]) * lp(1, y1[i]))
-		(lp(4, x1[i]) * lp(2, y1[i]))
-		(lp(3, x1[i]) * lp(3, y1[i]))
-		(lp(2, x1[i]) * lp(4, y1[i]))
-		(lp(1, x1[i]) * lp(5, y1[i]))
-		(lp(6, y1[i]))
-
-		(lp(7, x1[i]))
-		(lp(6, x1[i]) * lp(1, y1[i]))
-		(lp(5, x1[i]) * lp(2, y1[i]))
-		(lp(4, x1[i]) * lp(3, y1[i]))
-		(lp(3, x1[i]) * lp(4, y1[i]))
-		(lp(2, x1[i]) * lp(5, y1[i]))
-		(lp(1, x1[i]) * lp(6, y1[i]))
-		(lp(7, y1[i]))
-
-		(lp(8, x1[i]))
-		(lp(7, x1[i]) * lp(1, y1[i]))
-		(lp(6, x1[i]) * lp(2, y1[i]))
-		(lp(5, x1[i]) * lp(3, y1[i]))
-		(lp(4, x1[i]) * lp(4, y1[i]))
-		(lp(3, x1[i]) * lp(5, y1[i]))
-		(lp(2, x1[i]) * lp(6, y1[i]))
-		(lp(1, x1[i]) * lp(7, y1[i]))
-		(lp(8, y1[i]))
-
+	plt.contour(x11, x22, wregdone[0] + wregdone[1]*x11 + wregdone[2]*x22 + wregdone[3]*x11**2 \
+	+ wregdone[4]*x11*x22 + wregdone[5]*x22**2 + wregdone[6]*x11**3 + wregdone[7]*x11**2*x22 + \
+	wregdone[8]*x11*x22**2 + wregdone[9]*x22**3 + wregdone[10]*x11**4 + wregdone[11]*x11**3*x22 + \
+	wregdone[12]*x11**2*x22**2 + wregdone[13]*x11*x22**3 + wregdone[14]*x22**4 + wregdone[15]*x11**5\
+	 + wregdone[16]*x11**4*x22 + wregdone[17]*x11**3*x22**2 + wregdone[18]*x11**2*x22**3 + wregdone[19]*x11*x22**4 +\
+	 wregdone[20]*x22**5 + wregdone[21]*x11**6 + wregdone[22]*x11**5*x22 + wregdone[23]*x11**4*x22**2 + \
+	 wregdone[24]*x11**3*x22**3 + wregdone[25]*x11**2*x22**4 + wregdone[26]*x11*x22**5 + wregdone[27]*x22**6 + \
+	  wregdone[28]*x11**7 + wregdone[29]*x11**6*x22 + wregdone[30]*x11**5*x22**2 + wregdone[31]*x11**4*x22**3 + \
+	  wregdone[32]*x11**3*x22**4 + wregdone[33]*x11**2*x22**5 + wregdone[34]*x11*x22**6 + wregdone[35]*x22**7 + \
+	 wregdone[36]*x11**8 + wregdone[37]*x11**7*x22 + wregdone[38]*x11**6*x22**2 + wregdone[39]*x11**5*x22**3 + \
+	  wregdone[40]*x11**4*x22**4 + wregdone[41]*x11**3*x22**5 + wregdone[42]*x11**2*x22**6 + wregdone[43]*x11*x22**7 +\
+	  wregdone[44]*x22**8)
 
 def lp(k, x):
 	if (k == 0):
@@ -469,9 +205,9 @@ def lp(k, x):
 	return firstTerm - secondTerm 
 
 if __name__ == "__main__":
-	f = open("ZipDigits.train", 'r')
+	f = open("ZipDigits.test", 'r')
 
-	pocketTop = 5
+	pocketTop = 500
 	x1 = []
 	y1 = []
 	xN = []
@@ -493,35 +229,34 @@ if __name__ == "__main__":
 
 	#make data with 1 in beginning
 	data = []
-	#data = getData3(x1, y1, xN, yN)
 	data = getData8L(x1, y1, xN, yN)
 	ys = getYs(x1, xN)
 
-	#get wlin
-	#wlinorreg = getWLin(data, ys)
 	#get wreg
-	lambdareg = 0.0
-	wlinorreg = getWReg(data, ys, lambdareg)
-
-	i = 0
-	while (i < len(w)):
-		w[i] = wlinorreg[i].item(0,0)
-		i += 1
-
-	wbest = runSimulation(ys, data)
+	lambdareg = 0.00
+	wreg = getWReg(data, ys, lambdareg)
 
 	#if training, put info here
 	#if (whichFile == "test"):
 		#wbest = [3900.9537672701094, 132444.29258090307, 945.3587626474581, 3956844.6179376612, 29690.85822605399, 224.39950620190498, -44418.04716501154, 391730.36874999397, 4700.622216805807, 35.35717958521439]
 
+	print("len(data[0]): ", len(data[0]))
+	print("wreg: ", wreg)
+	print("len(wreg): ", len(wreg))
+
+	i = 0
+	wregdone = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	while (i < len(wreg)):
+		wregdone[i] = wreg[i].item(0,0)
+		i += 1
+
 	fig = plt.figure()
 	plt.plot(xN, yN, 'rx')
 	plt.plot(x1, y1, 'bo')
-	contourPlot(x1, y1, xN, yN, features)
+	contourPlot(x1, y1, xN, yN)
 	
 	#calculate Ein
-	print("wbest: ", wbest)
-	Ein = EinCalc(data, ys, wbest)
+	Ein = EinCalc(data, ys, wregdone)
 	print("Ein: ", Ein)
 
 	fig.suptitle('digits', fontsize = 20)
