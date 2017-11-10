@@ -7,6 +7,7 @@ from random import randint
 import random
 
 features = 45
+pocketTop = 500
 
 def normalizeFeatures(x1, y1, xN, yN):
 	minX = 10000
@@ -160,14 +161,6 @@ def getWReg(data, ys, lambdareg):
 
 	return wreg
 
-def contourPlot(x1, y1, xN, yN):
-	x11 = numpy.linspace(-1.5, 1.5, 250)
-	x22 = numpy.linspace(-1.5, 1.5, 250)
-	x11, x22 = numpy.meshgrid(x11, x22)	
-
-	#now, plot
-	plt.contour(x11, x22, sum([a*b for a,b in zip(legendreData(x11, x22, 8), wregdone)]), [0])
-
 def lp(k, x):
 	if (k == 0):
 		return 1
@@ -177,21 +170,22 @@ def lp(k, x):
 	secondTerm = ((k - 1)/k)*lp(k - 2, x)
 	return firstTerm - secondTerm 
 
-def cv(dataCV, ysCV): #cross validation calculator (from lambda 0 to 2)
+def cv(dataCV, ysCV, lambdatop): #cross validation calculator (from lambda 0 to 2)
 	lambdaList = []
 	ECVlist = []
 	singleCvValue = 0
 
 	i = 0
-	while (i < 2.1):
-		print("lambda = ", i)
+	while (i < lambdatop):
+		print("CVlambda = ", i)
 		numWrong = 0
 		lambdaList.append(i)
 		j = 0
 		while (j < len(dataCV)):
+			#make new list of data without a point
 			newList = []
 			k = 0
-			while (k <= j):
+			while (k < j):
 				newList.append(dataCV[k])
 				k += 1
 			k = (j+1)
@@ -199,9 +193,10 @@ def cv(dataCV, ysCV): #cross validation calculator (from lambda 0 to 2)
 				newList.append(dataCV[k])
 				k += 1
 
+			#make new list of ys without a point
 			newYs = []
 			k = 0
-			while (k <= j):
+			while (k < j):
 				newYs.append(ysCV[k])
 				k += 1
 			k = (j+1)
@@ -209,21 +204,48 @@ def cv(dataCV, ysCV): #cross validation calculator (from lambda 0 to 2)
 				newYs.append(ysCV[k])
 				k += 1
 
+			#make new Wreg(with lambda) and then check the point you left out
 			wCV = getWReg(newList, newYs, i)
 			if (checkBad(j, dataCV, ysCV, wCV) == False):
 				numWrong += 1
 			j += 1
 
+		#append the number of points incorrect
 		ECVlist.append(numWrong/(len(dataCV)))
 		i += 0.1
 
-	print("lambdaList: ", lambdaList)
-	print("ECVlist: ", ECVlist)
+	return (lambdaList, ECVlist)
 
-if __name__ == "__main__":
-	f = open("ZipDigits.train", 'r')
+def EinCalc(data, h, wtotest):
+	i = 0
+	wtotestbad = 0
+	while (i < len(data)):
+		if (checkBad(i, data, h, wtotest) == False):
+			# print("BAD")
+			wtotestbad += 1
+		i += 1
 
-	pocketTop = 500
+	return (wtotestbad/len(data))
+
+#needs to be changes to be on test set (currently ein on training)
+def Etest(dataET, ysET, lambdatop):
+	lambdaList = []
+	EtestList = []
+	i = 0
+	while (i < lambdatop):
+		print("Etestlambda: ", i)
+		lambdaList.append(i)
+		wET = getWReg(trainingData, trainingYs, i)
+		#need to send in wET of training, data and ys of testing 
+		EtestList.append(EinCalc(dataET, ysET, wET))
+		i += 0.1
+
+	return (EtestList)
+
+def handle(file):
+	lambdatop = 1.1
+	f = open(file, 'r')
+
 	x1 = []
 	y1 = []
 	xN = []
@@ -247,34 +269,29 @@ if __name__ == "__main__":
 	data = []
 	data = getData8L(x1, y1, xN, yN)
 	ys = getYs(x1, xN)
-
-	#get wreg
-	lambdareg = 2.00
-	wreg = getWReg(data, ys, lambdareg)
-
-	#if training, put info here
-	#if (whichFile == "test"):
-		#wbest = [3900.9537672701094, 132444.29258090307, 945.3587626474581, 3956844.6179376612, 29690.85822605399, 224.39950620190498, -44418.04716501154, 391730.36874999397, 4700.622216805807, 35.35717958521439]
-
-	# print("len(data[0]): ", len(data[0]))
-	# print("wreg: ", wreg)
-	# print("len(wreg): ", len(wreg))
-
-	i = 0
-	wregdone = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	while (i < len(wreg)):
-		wregdone[i] = wreg[i].item(0,0)
-		i += 1
-
-	fig = plt.figure()
-	plt.plot(xN, yN, 'rx')
-	plt.plot(x1, y1, 'bo')
-	contourPlot(x1, y1, xN, yN)
 	
-	#calculate Ein
-	cv(data, ys)
+	if (file == "ZipDigits.train"):
+		#updating global variables
+		trainingData = data
+		trainingYs = ys
+		#calculate CV
+		LambdaList, CVAnswer = cv(data, ys, lambdatop)
+		return (LambdaList, CVAnswer)
+	if (file == "ZipDigits.test"):
+		#calculate Etest
+		EtestAnswer = Etest(data, ys, lambdatop)
+		return EtestAnswer
 
-	fig.suptitle('digits', fontsize = 20)
-	plt.xlabel('asymmetry', fontsize = 18)
-	plt.ylabel('intensity', fontsize = 18)
-	plt.show()
+if __name__ == "__main__":
+	trainingData = []
+	trainingYs = []
+	testingData = []
+	testingYs = []
+
+	LambdaList, CVAnswer = handle("ZipDigits.train")
+	EtestAnswer = handle("ZipDigits.test")
+
+	print("Lambda List: ", lambdaList)
+	print("CVAnswer: ", CVAnswer)
+	print("EtestAnswer: ", EtestAnswer)
+	
