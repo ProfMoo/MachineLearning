@@ -23,12 +23,12 @@ if __name__ == "__main__":
 	i = 0
 	while (i < 300):
 		testData = random.randint(0, lineCount)
-		fileTest.write(info.pop(i))
+		fileTrain.write(info.pop(i))
 		i += 1
 
 	print("len(info): ", len(info))
 
 	i = 0
 	while (i < len(info)):
-		fileTrain.write(info[i])
+		fileTest.write(info[i])
 		i += 1

@@ -84,6 +84,20 @@ def getSymmetry(trainingDigit):
 		i += 1
 	return (xsymmetry+ysymmetry)
 
+def legendreData(x1, y1, degree):
+	singlePoint = []
+
+	i = 0
+	while (i < (degree+1)):
+		j = 0
+		while (j < (i+1)):
+			singlePoint.append(lp(i-j, x1) * lp(j, y1))
+			j += 1
+		i += 1
+
+	return singlePoint
+
+
 def getData8L(x1, y1, xN, yN):
 	databack = []
 	singledata = []
@@ -92,34 +106,16 @@ def getData8L(x1, y1, xN, yN):
 	i = 0
 	while (i < len(x1)):
 		singledata = []
-		singledata.append(1)
-		j = 0
-		while (j < polynum):
-			k = j
-			while (k >= 0):
-				singledata.append(lp(k + 1, x1[i]) * lp((j - k), y1[i]))
-				k -= 1
-			singledata.append(lp((j + 1), y1[i]))
-			j += 1
+		singledata = legendreData(x1[i], y1[i], polynum)
 		databack.append(singledata)
 		i += 1
 
 	i = 0
 	while (i < len(xN)):
 		singledata = []
-		singledata.append(1)
-		j = 0
-		while (j < polynum):
-			k = j
-			while (k >= 0):
-				singledata.append(lp(k + 1, xN[i]) * lp((j - k), yN[i]))
-				k -= 1
-			singledata.append(lp((j + 1), yN[i]))
-			j += 1
+		singledata = legendreData(xN[i], yN[i], polynum)
 		databack.append(singledata)
 		i += 1
-
-	print("checking len(databack[0]): ", len(databack[0]))
 
 	return databack
 
@@ -170,7 +166,7 @@ def EinCalc(data, h, wtotest):
 	wtotestbad = 0
 	while (i < len(data)):
 		if (checkBad(i, data, h, wtotest) == False):
-			print("BAD")
+			# print("BAD")
 			wtotestbad += 1
 		i += 1
 
@@ -182,18 +178,7 @@ def contourPlot(x1, y1, xN, yN):
 	x11, x22 = numpy.meshgrid(x11, x22)	
 
 	#now, plot
-	plt.contour(x11, x22, wregdone[0] + wregdone[1]*x11 + wregdone[2]*x22 + wregdone[3]*x11**2 \
-	+ wregdone[4]*x11*x22 + wregdone[5]*x22**2 + wregdone[6]*x11**3 + wregdone[7]*x11**2*x22 + \
-	wregdone[8]*x11*x22**2 + wregdone[9]*x22**3 + wregdone[10]*x11**4 + wregdone[11]*x11**3*x22 + \
-	wregdone[12]*x11**2*x22**2 + wregdone[13]*x11*x22**3 + wregdone[14]*x22**4 + wregdone[15]*x11**5\
-	 + wregdone[16]*x11**4*x22 + wregdone[17]*x11**3*x22**2 + wregdone[18]*x11**2*x22**3 + wregdone[19]*x11*x22**4 +\
-	 wregdone[20]*x22**5 + wregdone[21]*x11**6 + wregdone[22]*x11**5*x22 + wregdone[23]*x11**4*x22**2 + \
-	 wregdone[24]*x11**3*x22**3 + wregdone[25]*x11**2*x22**4 + wregdone[26]*x11*x22**5 + wregdone[27]*x22**6 + \
-	  wregdone[28]*x11**7 + wregdone[29]*x11**6*x22 + wregdone[30]*x11**5*x22**2 + wregdone[31]*x11**4*x22**3 + \
-	  wregdone[32]*x11**3*x22**4 + wregdone[33]*x11**2*x22**5 + wregdone[34]*x11*x22**6 + wregdone[35]*x22**7 + \
-	 wregdone[36]*x11**8 + wregdone[37]*x11**7*x22 + wregdone[38]*x11**6*x22**2 + wregdone[39]*x11**5*x22**3 + \
-	  wregdone[40]*x11**4*x22**4 + wregdone[41]*x11**3*x22**5 + wregdone[42]*x11**2*x22**6 + wregdone[43]*x11*x22**7 +\
-	  wregdone[44]*x22**8)
+	plt.contour(x11, x22, sum([a*b for a,b in zip(legendreData(x11, x22, 8), wregdone)]), [0])
 
 def lp(k, x):
 	if (k == 0):
@@ -205,7 +190,7 @@ def lp(k, x):
 	return firstTerm - secondTerm 
 
 if __name__ == "__main__":
-	f = open("ZipDigits.test", 'r')
+	f = open("ZipDigits.train", 'r')
 
 	pocketTop = 500
 	x1 = []
@@ -233,16 +218,16 @@ if __name__ == "__main__":
 	ys = getYs(x1, xN)
 
 	#get wreg
-	lambdareg = 0.00
+	lambdareg = 2.00
 	wreg = getWReg(data, ys, lambdareg)
 
 	#if training, put info here
 	#if (whichFile == "test"):
 		#wbest = [3900.9537672701094, 132444.29258090307, 945.3587626474581, 3956844.6179376612, 29690.85822605399, 224.39950620190498, -44418.04716501154, 391730.36874999397, 4700.622216805807, 35.35717958521439]
 
-	print("len(data[0]): ", len(data[0]))
-	print("wreg: ", wreg)
-	print("len(wreg): ", len(wreg))
+	# print("len(data[0]): ", len(data[0]))
+	# print("wreg: ", wreg)
+	# print("len(wreg): ", len(wreg))
 
 	i = 0
 	wregdone = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
