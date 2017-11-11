@@ -227,7 +227,6 @@ def EinCalc(data, h, wtotest):
 
 	return (wtotestbad/len(data))
 
-#needs to be changes to be on test set (currently ein on training)
 def Etest(dataET, ysET, lambdatop):
 	lambdaList = []
 	EtestList = []
@@ -235,6 +234,7 @@ def Etest(dataET, ysET, lambdatop):
 	while (i < lambdatop):
 		print("Etestlambda: ", i)
 		lambdaList.append(i)
+		#print("trainingData: ", trainingData)
 		wET = getWReg(trainingData, trainingYs, i)
 		#need to send in wET of training, data and ys of testing 
 		EtestList.append(EinCalc(dataET, ysET, wET))
@@ -243,7 +243,7 @@ def Etest(dataET, ysET, lambdatop):
 	return (EtestList)
 
 def handle(file):
-	lambdatop = 1.1
+	lambdatop = 2.01
 	f = open(file, 'r')
 
 	x1 = []
@@ -271,27 +271,28 @@ def handle(file):
 	ys = getYs(x1, xN)
 	
 	if (file == "ZipDigits.train"):
-		#updating global variables
-		trainingData = data
-		trainingYs = ys
 		#calculate CV
 		LambdaList, CVAnswer = cv(data, ys, lambdatop)
-		return (LambdaList, CVAnswer)
+		return (data, ys, LambdaList, CVAnswer)
 	if (file == "ZipDigits.test"):
 		#calculate Etest
 		EtestAnswer = Etest(data, ys, lambdatop)
 		return EtestAnswer
 
 if __name__ == "__main__":
-	trainingData = []
-	trainingYs = []
-	testingData = []
-	testingYs = []
-
-	LambdaList, CVAnswer = handle("ZipDigits.train")
+	trainingData, trainingYs, LambdaList, CVAnswer = handle("ZipDigits.train")
 	EtestAnswer = handle("ZipDigits.test")
 
-	print("Lambda List: ", lambdaList)
+	print("Lambda List: ", LambdaList)
 	print("CVAnswer: ", CVAnswer)
 	print("EtestAnswer: ", EtestAnswer)
 	
+	fig = plt.figure()
+	plt.plot(LambdaList, CVAnswer, 'ro', label='cv')
+	plt.plot(LambdaList, EtestAnswer, 'bo', label='etest')
+	fig.suptitle('error calculation', fontsize = 20)
+	plt.xlabel('lambda', fontsize = 18)
+	plt.ylabel('error', fontsize = 18)
+	plt.legend(loc = 'upper right')
+	plt.axis([0, 2.1, 0, 0.075])
+	plt.show()
