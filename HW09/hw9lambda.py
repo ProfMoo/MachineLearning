@@ -207,4 +207,4 @@ def handle(file, lambdaPlot):
 	plt.show()
 
 if __name__ == "__main__":
-	handle("ZipDigits.train", 15.0)
+	handle("ZipDigits.train", 1000)
