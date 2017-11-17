@@ -212,7 +212,7 @@ def cv(dataCV, ysCV, lambdatop): #cross validation calculator (from lambda 0 to 
 
 		#append the number of points incorrect
 		ECVlist.append(numWrong/(len(dataCV)))
-		i += 10
+		i += 0.1
 
 	return (lambdaList, ECVlist)
 
@@ -238,12 +238,12 @@ def Etest(dataET, ysET, lambdatop):
 		wET = getWReg(trainingData, trainingYs, i)
 		#need to send in wET of training, data and ys of testing 
 		EtestList.append(EinCalc(dataET, ysET, wET))
-		i += 10
+		i += 0.1
 
 	return (EtestList)
 
 def handle(file):
-	lambdatop = 1000.01
+	lambdatop = 15.01
 	f = open(file, 'r')
 
 	x1 = []
@@ -295,5 +295,5 @@ if __name__ == "__main__":
 	plt.xlabel('lambda', fontsize = 18)
 	plt.ylabel('error', fontsize = 18)
 	plt.legend(loc = 'upper right')
-	plt.axis([0, 1000, 0, 0.075])
+	plt.axis([0, 15.01, 0, 0.075])
 	plt.show()
