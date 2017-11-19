@@ -38,6 +38,44 @@ def getData():
 
 	return (dataPOS, dataNEG)
 
+def tranOne(x1, x2):
+	return math.sqrt(x1**2 + x2**2)
+
+def tranTwo(x1, x2):
+	return math.atan2(x2, x1)
+	# if (x1 == 0):
+	# 	if (x2 > 0):
+	# 		return (math.pi/2)
+	# 	elif (x2 < 0):
+	# 		return (-math.pi/2)
+	# return numpy.arctan(x2/x1)
+
+def zTransform(dataPOS, dataNEG):
+	zDataPOS = []
+	zDataNEG = []
+	i = 0
+	while (i < 3):
+		zDataPOS.append(list())
+		zDataNEG.append(list())
+		i += 1
+
+	i = 0
+	while (i < len(dataPOS[0])):
+		zDataPOS[0].append(1)
+		zDataPOS[1].append(tranOne(dataPOS[1][i], dataPOS[2][i]))
+		zDataPOS[2].append(tranTwo(dataPOS[1][i], dataPOS[2][i]))
+		i += 1
+	i = 0
+	while (i < len(dataNEG[0])):
+		zDataNEG[0].append(1)
+		zDataNEG[1].append(tranOne(dataNEG[1][i], dataNEG[2][i]))
+		zDataNEG[2].append(tranTwo(dataNEG[1][i], dataNEG[2][i]))
+		i += 1
+
+	print("zDataPOS: ", zDataPOS)
+	print("zDataNEG: ", zDataNEG)
+	return (zDataPOS, zDataNEG)
+
 def getDistance(testPoint, dataPointx1, dataPointx2):
 	return math.sqrt( ((testPoint[1]-dataPointx1)**2) + ((testPoint[2]-dataPointx2)**2) )
 
@@ -75,9 +113,6 @@ def getMin(NN, testPoint, dataPOS, dataNEG):
 			j -= 1
 		i += 1
 
-	print("mins[1]", mins[1])
-	print("mins[2]", mins[2])
-
 	i = 0
 	numSum = 0
 	while (i < NN):
@@ -88,14 +123,6 @@ def getMin(NN, testPoint, dataPOS, dataNEG):
 		return 1
 	elif (numSum < 0):
 		return -1
-
-
-# def test(testPoint, dataPOS, dataNEG):
-# 	result = getMin(testPoint, dataPOS, dataNEG)
-# 	if (result == 1):
-# 		plt.plot(testPoint[1], testPoint[2], 'bs', label = "testpoint")
-# 	elif (result == -1):
-# 		plt.plot(testPoint[1], testPoint[2], 'rs', label = "testpoint")
 
 def makeGraph(NN, startingX1, endingX1, startingX2, endingX2, increment, dataPOS, dataNEG):
 	NNdataPOS = []
@@ -134,10 +161,11 @@ def plot(dataPOS, dataNEG, x1beg, x1end, x2beg, x2end):
 
 def main():
 	dataPOS, dataNEG = getData()
+	zDataPOS, zDataNEG = zTransform(dataPOS, dataNEG)
 	x1beg = -3.0
-	x1end = 3.0
+	x1end = 4.0
 	x2beg = -3.0
-	x2end = 3.0
+	x2end = 5.0
 
 	fig = plt.figure()
 	fig.suptitle('Nearest Neighbor', fontsize = 20)
@@ -146,12 +174,14 @@ def main():
 	plt.legend(loc = 'upper right')
 	plt.axis([x1beg, x1end, x2beg, x2end])
 
-	# plot(dataPOS, dataNEG, x1beg, x1end, x2beg, x2end)
-	NNPOS, NNNEG = makeGraph(3, x1beg, x1end, x2beg, x2end, 0.1, dataPOS, dataNEG)
+	#part 1
+	#plot(dataPOS, dataNEG, x1beg, x1end, x2beg, x2end)
+	#NNPOS, NNNEG = makeGraph(1, x1beg, x1end, x2beg, x2end, 0.1, dataPOS, dataNEG)
+	#plot(NNPOS, NNNEG, x1beg, x1end, x2beg, x2end)
+
+	#plot(zDataPOS, zDataNEG, x1beg, x1end, x2beg, x2end)
+	NNPOS, NNNEG = makeGraph(3, x1beg, x1end, x2beg, x2end, 0.1, zDataPOS, zDataNEG)
 	plot(NNPOS, NNNEG, x1beg, x1end, x2beg, x2end)
-	# test([1,-1,1], dataPOS, dataNEG)
-	# test([1,1,-2], dataPOS, dataNEG)
-	# test([1, -1,-1], dataPOS, dataNEG)
 	plt.show()
 
 if __name__ == "__main__":
