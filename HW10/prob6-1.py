@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 from random import randint
 import random
 
+from NNOB import *
+
 def getData():
 	dataPOS = []
 	dataNEG = []
@@ -39,49 +41,80 @@ def getData():
 def getDistance(testPoint, dataPointx1, dataPointx2):
 	return math.sqrt( ((testPoint[1]-dataPointx1)**2) + ((testPoint[2]-dataPointx2)**2) )
 
-def getMin(testPoint, dataPOS, dataNEG):
-	posMin = 65536
-	negMin = 65536
+def getMin(NN, testPoint, dataPOS, dataNEG):
+	
+	#make this generic
+	mins = []
+	i = 0
+	while (i < NN):
+		mins.append(NNOB(65536, 0))
+		i += 1
+
 	i = 0
 	while (i < len(dataPOS[0])):
-		testNum = getDistance(testPoint, dataPOS[1][i], dataPOS[2][i])
-		if (testNum < posMin):
-			posMin = testNum
+		testNum = NNOB(getDistance(testPoint, dataPOS[1][i], dataPOS[2][i]), 1)
+
+		#looping is bad. need to replace biggest, not smallest
+		j = (NN-1)
+		while (j >= 0):
+			if (testNum < mins[j]):
+				mins[j] = testNum
+				mins.sort()
+				break
+			j -= 1
 		i += 1
 	i = 0
 	while (i < len(dataNEG[0])):
-		testNum = getDistance(testPoint, dataNEG[1][i], dataNEG[2][i])
-		if (testNum < negMin):
-			negMin = testNum
+		testNum = NNOB(getDistance(testPoint, dataNEG[1][i], dataNEG[2][i]), -1)
+		j = (NN-1)
+		while (j >= 0):
+			if (testNum < mins[j]):
+				mins[j] = testNum
+				mins.sort()
+				break
+			j -= 1
 		i += 1
 
-	if (posMin <= negMin):
+	print("mins[1]", mins[1])
+	print("mins[2]", mins[2])
+
+	i = 0
+	numSum = 0
+	while (i < NN):
+		numSum += mins[i].classification
+		i += 1
+
+	if (numSum >= 0):
 		return 1
-	elif (posMin > negMin):
+	elif (numSum < 0):
 		return -1
 
 
-def test(testPoint, dataPOS, dataNEG):
-	result = getMin(testPoint, dataPOS, dataNEG)
-	if (result == 1):
-		plt.plot(testPoint[1], testPoint[2], 'bs', label = "testpoint")
-	elif (result == -1):
-		plt.plot(testPoint[1], testPoint[2], 'rs', label = "testpoint")
+# def test(testPoint, dataPOS, dataNEG):
+# 	result = getMin(testPoint, dataPOS, dataNEG)
+# 	if (result == 1):
+# 		plt.plot(testPoint[1], testPoint[2], 'bs', label = "testpoint")
+# 	elif (result == -1):
+# 		plt.plot(testPoint[1], testPoint[2], 'rs', label = "testpoint")
 
-def makeGraph(startingX1, endingX1, startingX2, endingX2, increment, dataPOS, dataNEG):
+def makeGraph(NN, startingX1, endingX1, startingX2, endingX2, increment, dataPOS, dataNEG):
 	NNdataPOS = []
 	NNdataNEG = []
+
+	#making place holder for data
 	i = 0
 	while (i < 3):
 		NNdataPOS.append([])
 		NNdataNEG.append([])
 		i += 1
+
+	#looping through all locations in NN graph
 	i = startingX1
 	while (i < endingX1):
 		print("i:", i)
 		j = startingX2
 		while (j < endingX2):
-			result = getMin([1,i,j], dataPOS, dataNEG)
+			result = getMin(NN, [1,i,j], dataPOS, dataNEG)
 			if (result == 1):
 				NNdataPOS[0].append(1)
 				NNdataPOS[1].append(i)
@@ -99,7 +132,6 @@ def plot(dataPOS, dataNEG, x1beg, x1end, x2beg, x2end):
 	plt.plot(dataPOS[1], dataPOS[2], 'bo', label = "1")
 	plt.plot(dataNEG[1], dataNEG[2], 'rx', label = "-1")
 
-
 def main():
 	dataPOS, dataNEG = getData()
 	x1beg = -3.0
@@ -115,7 +147,7 @@ def main():
 	plt.axis([x1beg, x1end, x2beg, x2end])
 
 	# plot(dataPOS, dataNEG, x1beg, x1end, x2beg, x2end)
-	NNPOS, NNNEG = makeGraph(x1beg, x1end, x2beg, x2end, 0.1, dataPOS, dataNEG)
+	NNPOS, NNNEG = makeGraph(3, x1beg, x1end, x2beg, x2end, 0.1, dataPOS, dataNEG)
 	plot(NNPOS, NNNEG, x1beg, x1end, x2beg, x2end)
 	# test([1,-1,1], dataPOS, dataNEG)
 	# test([1,1,-2], dataPOS, dataNEG)
