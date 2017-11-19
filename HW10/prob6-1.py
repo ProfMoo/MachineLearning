@@ -68,20 +68,59 @@ def test(testPoint, dataPOS, dataNEG):
 	elif (result == -1):
 		plt.plot(testPoint[1], testPoint[2], 'rs', label = "testpoint")
 
+def makeGraph(startingX1, endingX1, startingX2, endingX2, increment, dataPOS, dataNEG):
+	NNdataPOS = []
+	NNdataNEG = []
+	i = 0
+	while (i < 3):
+		NNdataPOS.append([])
+		NNdataNEG.append([])
+		i += 1
+	i = startingX1
+	while (i < endingX1):
+		print("i:", i)
+		j = startingX2
+		while (j < endingX2):
+			result = getMin([1,i,j], dataPOS, dataNEG)
+			if (result == 1):
+				NNdataPOS[0].append(1)
+				NNdataPOS[1].append(i)
+				NNdataPOS[2].append(j)
+			if (result == -1):
+				NNdataNEG[0].append(1)
+				NNdataNEG[1].append(i)
+				NNdataNEG[2].append(j)
+			j += increment
+		i += increment
 
-def plot(dataPOS, dataNEG):
-	fig = plt.figure()
+	return (NNdataPOS, NNdataNEG)
+
+def plot(dataPOS, dataNEG, x1beg, x1end, x2beg, x2end):
 	plt.plot(dataPOS[1], dataPOS[2], 'bo', label = "1")
 	plt.plot(dataNEG[1], dataNEG[2], 'rx', label = "-1")
+
+
+def main():
+	dataPOS, dataNEG = getData()
+	x1beg = -3.0
+	x1end = 3.0
+	x2beg = -3.0
+	x2end = 3.0
+
+	fig = plt.figure()
 	fig.suptitle('Nearest Neighbor', fontsize = 20)
 	plt.xlabel('x1', fontsize = 18)
 	plt.ylabel('x2', fontsize = 18)
 	plt.legend(loc = 'upper right')
-	plt.axis([-2.5,2.5,-2.5,2.5])
+	plt.axis([x1beg, x1end, x2beg, x2end])
+
+	# plot(dataPOS, dataNEG, x1beg, x1end, x2beg, x2end)
+	NNPOS, NNNEG = makeGraph(x1beg, x1end, x2beg, x2end, 0.1, dataPOS, dataNEG)
+	plot(NNPOS, NNNEG, x1beg, x1end, x2beg, x2end)
+	# test([1,-1,1], dataPOS, dataNEG)
+	# test([1,1,-2], dataPOS, dataNEG)
+	# test([1, -1,-1], dataPOS, dataNEG)
+	plt.show()
 
 if __name__ == "__main__":
-	dataPOS, dataNEG = getData()
-	plot(dataPOS, dataNEG)
-	test([1,-1,1], dataPOS, dataNEG)
-	test([1,1,-2], dataPOS, dataNEG)
-	plt.show()
+	main()
