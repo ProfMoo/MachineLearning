@@ -42,7 +42,7 @@ def tranOne(x1, x2):
 	return math.sqrt(x1**2 + x2**2)
 
 def tranTwo(x1, x2):
-	return math.atan2(x2, x1)
+	return math.atan(x2/(x1+0.00000001))
 	# if (x1 == 0):
 	# 	if (x2 > 0):
 	# 		return (math.pi/2)
@@ -80,9 +80,17 @@ def getDistance(testPoint, dataPointx1, dataPointx2):
 	return math.sqrt( ((testPoint[1]-dataPointx1)**2) + ((testPoint[2]-dataPointx2)**2) )
 
 def getDistanceZ(testPoint, dataPointx1, dataPointx2):
-	partOne = (math.sqrt(testPoint[1]**2+testPoint[2]**2)) - (math.sqrt(dataPointx1**2+dataPointx2**2))
-	partTwo = math.atan2(testPoint[2],testPoint[1]) - math.atan2(dataPointx2,dataPointx1)
-	return math.sqrt( partOne**2 + partTwo**2 )
+	zTest = [tranOne(testPoint[1], testPoint[2]), tranTwo(testPoint[1], testPoint[2])]
+	zData = [tranOne(dataPointx1, dataPointx2), tranTwo(dataPointx1, dataPointx2)]
+
+	#distance = numpy.linalg.norm(numpy.array(zTest) - numpy.array(zData))
+	distance = math.sqrt((zTest[1] - zData[1])**2 + (zTest[0] - zData[0])**2)
+
+	return distance
+
+	# partOne = (math.sqrt(testPoint[1]**2+testPoint[2]**2)) - (math.sqrt(dataPointx1**2+dataPointx2**2))
+	# partTwo = numpy.arctan(testPoint[2]/(testPoint[1]+0.000000001)) - numpy.arctan(dataPointx2/(dataPointx1+0.000000001))
+	# return math.sqrt( partOne**2 + partTwo**2 )
 
 def getMin(NN, testPoint, dataPOS, dataNEG):
 	
@@ -133,7 +141,7 @@ def getMinZ(NN, testPoint, dataPOS, dataNEG):
 	mins = []
 	i = 0
 	while (i < NN):
-		mins.append(NNOB(1000000, 0))
+		mins.append(NNOB(65536, 0))
 		i += 1
 
 	i = 0
@@ -184,10 +192,13 @@ def makeGraph(NN, startingX1, endingX1, startingX2, endingX2, increment, dataPOS
 	#looping through all locations in NN graph
 	i = startingX1
 	while (i < endingX1):
-		print("i:", i)
+		print("i: ", i)
 		j = startingX2
 		while (j < endingX2):
-			result = getMinZ(NN, [1,i,j], dataPOS, dataNEG)
+			if (j > 0.1):
+				result = getMinZ(NN, [1,math.fabs(i),j], dataPOS, dataNEG)
+			else:
+				result = getMinZ(NN, [1,-math.fabs(i),j], dataPOS, dataNEG)
 			#result = getMinZ(NN, [1,i,-math.fabs(j)], dataPOS, dataNEG)
 			if (result == 1):
 				NNdataPOS[0].append(1)
@@ -227,7 +238,7 @@ def main():
 
 	#part 1
 	plotOG(dataPOS, dataNEG, x1beg, x1end, x2beg, x2end)
-	NNPOS, NNNEG = makeGraph(3, x1beg, x1end, x2beg, x2end, 0.1, dataPOS, dataNEG)
+	NNPOS, NNNEG = makeGraph(1, x1beg, x1end, x2beg, x2end, 0.1, dataPOS, dataNEG)
 	plot(NNPOS, NNNEG, x1beg, x1end, x2beg, x2end)
 
 	# plotOG(zDataPOS, zDataNEG, x1beg, x1end, x2beg, x2end)
