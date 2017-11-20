@@ -21,6 +21,17 @@ class PointHolder(object):
 	def getPoint(self, i):
 		return (self.data)[i]
 
+	def getAvg(self):
+		i = 0
+		addX1 = 0
+		addX2 = 0
+		while (i < self.getLength()):
+			addX1 += (self.getPoint(i)).x1
+			addX2 += (self.getPoint(i)).x2
+			i += 1
+
+		return [addX1/self.getLength(), addX2/self.getLength()]
+
 	def getNewCenter(self, other):
 		i = 0
 		maxDistance = 0

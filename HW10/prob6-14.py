@@ -48,17 +48,22 @@ def runLloyds(points, numCenters, numPoints):
 		while (j < numCenters):
 			distance = getDistance(point, centerPoints.getPoint(j))
 			if (distance < minDistance):
-				distance = minDistance
+				minDistance = distance
 				incNum = j
 			j += 1 
 
 		groups[incNum].addPoint(point)
 		i += 1
 
+	# i = 0
+	# while (i < len(groups)):
+	# 	print(groups[i].getLength())
+	# 	i += 1
 	i = 0
 	while (i < len(groups)):
-		print(groups[i].getLength())
+		avgPoint = Point(groups[i].getAvg)
 		i += 1
+
 
 def plot(points):
 	i = 0
@@ -67,7 +72,7 @@ def plot(points):
 		i += 1
 
 def main():
-	numPoints = 1000
+	numPoints = 200
 	numCenters = 10
 	data = getData(numPoints)
 
