@@ -79,6 +79,11 @@ def zTransform(dataPOS, dataNEG):
 def getDistance(testPoint, dataPointx1, dataPointx2):
 	return math.sqrt( ((testPoint[1]-dataPointx1)**2) + ((testPoint[2]-dataPointx2)**2) )
 
+def getDistanceZ(testPoint, dataPointx1, dataPointx2):
+	partOne = (math.sqrt(testPoint[1]**2+testPoint[2]**2)) - (math.sqrt(dataPointx1**2+dataPointx2**2))
+	partTwo = math.atan2(testPoint[2],testPoint[1]) - math.atan2(dataPointx2,dataPointx1)
+	return math.sqrt( partOne**2 + partTwo**2 )
+
 def getMin(NN, testPoint, dataPOS, dataNEG):
 	
 	#make this generic
@@ -124,6 +129,47 @@ def getMin(NN, testPoint, dataPOS, dataNEG):
 	elif (numSum < 0):
 		return -1
 
+def getMinZ(NN, testPoint, dataPOS, dataNEG):
+	mins = []
+	i = 0
+	while (i < NN):
+		mins.append(NNOB(1000000, 0))
+		i += 1
+
+	i = 0
+	while (i < len(dataPOS[0])):
+		testNum = NNOB(getDistanceZ(testPoint, dataPOS[1][i], dataPOS[2][i]), 1)
+		j = (NN-1)
+		while (j >= 0):
+			if (testNum < mins[j]):
+				mins[j] = testNum
+				mins.sort()
+				break
+			j -= 1
+		i += 1
+	i = 0
+	while (i < len(dataNEG[0])):
+		testNum = NNOB(getDistanceZ(testPoint, dataNEG[1][i], dataNEG[2][i]), -1)
+		j = (NN-1)
+		while (j >= 0):
+			if (testNum < mins[j]):
+				mins[j] = testNum
+				mins.sort()
+				break
+			j -= 1
+		i += 1
+
+	i = 0
+	numSum = 0
+	while (i < NN):
+		numSum += mins[i].classification
+		i += 1
+
+	if (numSum >= 0):
+		return 1
+	elif (numSum < 0):
+		return -1
+
 def makeGraph(NN, startingX1, endingX1, startingX2, endingX2, increment, dataPOS, dataNEG):
 	NNdataPOS = []
 	NNdataNEG = []
@@ -141,7 +187,8 @@ def makeGraph(NN, startingX1, endingX1, startingX2, endingX2, increment, dataPOS
 		print("i:", i)
 		j = startingX2
 		while (j < endingX2):
-			result = getMin(NN, [1,i,j], dataPOS, dataNEG)
+			result = getMinZ(NN, [1,i,j], dataPOS, dataNEG)
+			#result = getMinZ(NN, [1,i,-math.fabs(j)], dataPOS, dataNEG)
 			if (result == 1):
 				NNdataPOS[0].append(1)
 				NNdataPOS[1].append(i)
