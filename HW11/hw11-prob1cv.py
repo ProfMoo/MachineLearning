@@ -209,16 +209,8 @@ def plot(dataPOS, dataNEG, x1beg, x1end, x2beg, x2end):
 def plotOG(dataPOS, dataNEG, x1beg, x1end, x2beg, x2end):
 	plt.plot(dataPOS[1], dataPOS[2], 'bo', label = "1 NN")
 	plt.plot(dataNEG[1], dataNEG[2], 'rx', label = "-1 NN")
-	# i = 0
-	# while (i < len(dataPOS)):
-	# 	plt.plot(dataPOS[i][1], dataPOS[i][2], 'bo', label = "1 NN")
-	# 	i += 1
-	# i = 0
-	# while (i < len(dataNEG)):
-	# 	plt.plot(dataNEG[i][1], dataNEG[i][2], 'rx', label = "-1 NN")
-	# 	i += 1
 
-def handle(file):
+def handleTrain(file):
 	f = open(file, 'r')
 
 	x1 = []
@@ -259,12 +251,71 @@ def handle(file):
 	plt.axis([x1beg, x1end, x2beg, x2end])
 
 	#part 1
-	NNPOS, NNNEG = makeGraph(5, x1beg, x1end, x2beg, x2end, 0.01, dataPOS, dataNEG)
+	NNPOS, NNNEG = makeGraph(5, x1beg, x1end, x2beg, x2end, 0.10, dataPOS, dataNEG)
+	#NNPOS, NNNEG = makeGraph(5, x1beg, x1end, x2beg, x2end, 0.01, dataPOS, dataNEG)
 	plot(NNPOS, NNNEG, x1beg, x1end, x2beg, x2end)
 	plotOG(dataPOS, dataNEG, x1beg, x1end, x2beg, x2end)
-
 	plt.show()
 
+	return (NNPOS, NNNEG, hs)
+
+def roundDown(n, d=2):
+	d = int('1' + ('0' * d))
+	return math.floor(n * d)/d
+
+def roundUp(n, d=2):
+	d = int('1' + ('0' * d))
+	return math.ceil(n * d)/d
+
+def ETest(dataPOS, dataNEG):
+	#USE trainingNNPOS, trainingNNNEG
+	i = 0
+	while (i < len(dataPOS[0])):
+		#for each data point, find the point that is rounded up/down. all four corners
+		#then, get the distance to each
+		#get the minimum distance point
+		#then, if it matches classification, return 0
+		#if it doesn't return 1
+		#divide error by total number, then done
+		if (i < 20):
+			print("data: ", dataPOS[1][i], dataPOS[2][i])
+			down = roundDown(dataPOS[1][i])
+			up = roundUp(dataPOS[1][i])
+			print("data2: ", down, up)
+		i += 1
+
+	print("stuff: ")
+
+def handleTest(file):
+	f = open(file, 'r')
+
+	x1 = []
+	y1 = []
+	xN = []
+	yN = []
+
+	for line in f:
+		line = line.split(' ')
+		if (line[0] != '1.0000'):
+			line = line[1:-1]
+			xN.append(getSymmetry(line))
+			yN.append(getIntensity(line))
+		if (line[0] == '1.0000'):
+			line = line[1:-1]
+			x1.append(getSymmetry(line))
+			y1.append(getIntensity(line))
+
+	print("lens: ", len(x1), len(xN))
+
+	#normalize features
+	x1, y1, xN, yN = normalizeFeatures(x1, y1, xN, yN)
+	dataPOS, dataNEG = getData(x1, y1, xN, yN)
+
+	ETest(dataPOS, dataNEG)
+
 if __name__ == "__main__":
-	handle("ZipDigits.train")
+	traningNNPOS, traningNNNEG, traningHs = handleTrain("ZipDigits.train")
+	plt.clf()
+	handleTest("ZipDigits.test")
+
 
