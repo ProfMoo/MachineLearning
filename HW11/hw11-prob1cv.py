@@ -202,13 +202,101 @@ def makeGraph(NN, startingX1, endingX1, startingX2, endingX2, increment, dataPOS
 
 	return (NNdataPOS, NNdataNEG)
 
-def plot(dataPOS, dataNEG, x1beg, x1end, x2beg, x2end):
+def plot(dataPOS, dataNEG):
 	plt.plot(dataPOS[1], dataPOS[2], color = "#99CCFF", linestyle = 'none', marker = 'x', label = "1 Data")
 	plt.plot(dataNEG[1], dataNEG[2], color = "#FF9999", linestyle = 'none', marker = 'x', label = "-1 Data")
 
-def plotOG(dataPOS, dataNEG, x1beg, x1end, x2beg, x2end):
+def plotOG(dataPOS, dataNEG):
 	plt.plot(dataPOS[1], dataPOS[2], 'bo', label = "1 NN")
 	plt.plot(dataNEG[1], dataNEG[2], 'rx', label = "-1 NN")
+
+def roundDown(n, d=1):
+	d = int('1' + ('0' * d))
+	return math.floor(n * d)/d
+
+def roundUp(n, d=1):
+	d = int('1' + ('0' * d))
+	return math.ceil(n * d)/d
+
+def testPoint(data, i, j):
+	values = [0,0,0,0]
+	locations = [[0,0],[0,0],[0,0],[0,0]]
+
+	#bottomleft
+	try:
+		locations[0][0] = trainingNNPOS[1][trainingNNPOS[1].index(roundDown(data[i][1][j]))]
+		locations[0][1] = trainingNNPOS[2][trainingNNPOS[2].index(roundDown(data[i][2][j]))]
+		values[0] = 1
+	except:
+		locations[0][0] = trainingNNNEG[1][trainingNNNEG[1].index(roundDown(data[i][1][j]))]
+		locations[0][1] = trainingNNNEG[2][trainingNNNEG[2].index(roundDown(data[i][2][j]))]
+		values[0] = -1
+
+	#bottomright
+	try:
+		locations[1][0] = trainingNNPOS[1][trainingNNPOS[1].index(roundUp(data[i][1][j]))]
+		locations[1][1] = trainingNNPOS[2][trainingNNPOS[2].index(roundDown(data[i][2][j]))]
+		values[1] = 1
+	except:
+		locations[1][0] = trainingNNNEG[1][trainingNNNEG[1].index(roundUp(data[i][1][j]))]
+		locations[1][1] = trainingNNNEG[2][trainingNNNEG[2].index(roundDown(data[i][2][j]))]
+		values[1] = -1
+
+	#topleft
+	try:
+		locations[2][0] = trainingNNPOS[1][trainingNNPOS[1].index(roundUp(data[i][1][j]))]
+		locations[2][1] = trainingNNPOS[2][trainingNNPOS[2].index(roundDown(data[i][2][j]))]
+		values[2] = 1
+	except:
+		locations[2][0] = trainingNNNEG[1][trainingNNNEG[1].index(roundUp(data[i][1][j]))]
+		locations[2][1] = trainingNNNEG[2][trainingNNNEG[2].index(roundDown(data[i][2][j]))]
+		values[2] = -1
+
+	#topright
+	try:
+		locations[3][0] = trainingNNPOS[1][trainingNNPOS[1].index(roundUp(data[i][1][j]))]
+		locations[3][1] = trainingNNPOS[2][trainingNNPOS[2].index(roundUp(data[i][2][j]))]
+		values[3] = 1
+	except:
+		locations[3][0] = trainingNNNEG[1][trainingNNNEG[1].index(roundUp(data[i][1][j]))]
+		locations[3][1] = trainingNNNEG[2][trainingNNNEG[2].index(roundUp(data[i][2][j]))]
+		values[3] = -1
+
+	k = 0
+	minDistance = 65536
+	index = 65536
+	while (k < 3):
+		checkDis = getDistance([1, data[i][1][j], data[i][2][j]], locations[k][0], locations[k][1])
+		if (checkDis < minDistance):
+			index = k
+			minDistance = checkDis
+		k += 1
+
+	# if (j < 2):
+	# 	print("values: ", values)
+	# 	print("locations: ", locations)
+
+	if (values[index] == -1 and i == 0):
+		return 1
+	if (values[index] == 1 and i == 1):
+		return 1
+	else:
+		return 0
+
+def ETest(dataPOS, dataNEG):
+	#USE trainingNNPOS, trainingNNNEG
+	totalError = 0
+	data = [dataPOS, dataNEG]
+
+	i = 0
+	while (i < len(data)):
+		j = 0
+		while (j < len(data[i][0])):
+			totalError += testPoint(data, i, j)
+			j += 1
+		i += 1
+
+	return totalError/(len(dataPOS[0]) + len(dataNEG[0]))
 
 def handleTrain(file):
 	f = open(file, 'r')
@@ -251,97 +339,13 @@ def handleTrain(file):
 	plt.axis([x1beg, x1end, x2beg, x2end])
 
 	#part 1
-	#NNPOS, NNNEG = makeGraph(5, x1beg, x1end, x2beg, x2end, 0.10, dataPOS, dataNEG)
-	NNPOS, NNNEG = makeGraph(5, x1beg, x1end, x2beg, x2end, 0.01, dataPOS, dataNEG)
-	plot(NNPOS, NNNEG, x1beg, x1end, x2beg, x2end)
-	plotOG(dataPOS, dataNEG, x1beg, x1end, x2beg, x2end)
-	plt.show()
+	NNPOS, NNNEG = makeGraph(5, x1beg, x1end, x2beg, x2end, 0.10, dataPOS, dataNEG)
+	#NNPOS, NNNEG = makeGraph(5, x1beg, x1end, x2beg, x2end, 0.01, dataPOS, dataNEG)
+	plot(NNPOS, NNNEG)
+	#plotOG(dataPOS, dataNEG)
+	#plt.show()
 
 	return (NNPOS, NNNEG, hs)
-
-def roundDown(n, d=2):
-	d = int('1' + ('0' * d))
-	return math.floor(n * d)/d
-
-def roundUp(n, d=2):
-	d = int('1' + ('0' * d))
-	return math.ceil(n * d)/d
-
-def ETest(dataPOS, dataNEG):
-	#USE trainingNNPOS, trainingNNNEG
-	totalError = 0
-	data = [dataPOS, dataNEG]
-
-	i = 0
-	while (i < len(data)):
-		j = 0
-		while (j < len(data[i][0])):
-			values = [0,0,0,0]
-			locations = [[0,0],[0,0],[0,0],[0,0]]
-
-			#bottomleft
-			try:
-				locations[0][0] = trainingNNPOS[1][trainingNNPOS[1].index(roundDown(data[i][1][j]))]
-				locations[0][1] = trainingNNPOS[2][trainingNNPOS[2].index(roundDown(data[i][2][j]))]
-				values[0] = 1
-			except:
-				locations[0][0] = trainingNNNEG[1][trainingNNNEG[1].index(roundDown(data[i][1][j]))]
-				locations[0][1] = trainingNNNEG[2][trainingNNNEG[2].index(roundDown(data[i][2][j]))]
-				values[0] = -1
-
-			#bottomright
-			try:
-				locations[1][0] = trainingNNPOS[1][trainingNNPOS[1].index(roundUp(data[i][1][j]))]
-				locations[1][1] = trainingNNPOS[2][trainingNNPOS[2].index(roundDown(data[i][2][j]))]
-				values[1] = 1
-			except:
-				locations[1][0] = trainingNNNEG[1][trainingNNNEG[1].index(roundUp(data[i][1][j]))]
-				locations[1][1] = trainingNNNEG[2][trainingNNNEG[2].index(roundDown(data[i][2][j]))]
-				values[1] = -1
-
-			#topleft
-			try:
-				locations[2][0] = trainingNNPOS[1][trainingNNPOS[1].index(roundUp(data[i][1][j]))]
-				locations[2][1] = trainingNNPOS[2][trainingNNPOS[2].index(roundDown(data[i][2][j]))]
-				values[2] = 1
-			except:
-				locations[2][0] = trainingNNNEG[1][trainingNNNEG[1].index(roundUp(data[i][1][j]))]
-				locations[2][1] = trainingNNNEG[2][trainingNNNEG[2].index(roundDown(data[i][2][j]))]
-				values[2] = -1
-
-			#topright
-			try:
-				locations[3][0] = trainingNNPOS[1][trainingNNPOS[1].index(roundUp(data[i][1][j]))]
-				locations[3][1] = trainingNNPOS[2][trainingNNPOS[2].index(roundUp(data[i][2][j]))]
-				values[3] = 1
-			except:
-				locations[3][0] = trainingNNNEG[1][trainingNNNEG[1].index(roundUp(data[i][1][j]))]
-				locations[3][1] = trainingNNNEG[2][trainingNNNEG[2].index(roundUp(data[i][2][j]))]
-				values[3] = -1
-
-			k = 0
-			minDistance = 65536
-			index = 65536
-			while (k < 3):
-				checkDis = getDistance([1, data[i][1][j], data[i][2][j]], locations[k][0], locations[k][1])
-				if (checkDis < minDistance):
-					index = k
-					minDistance = checkDis
-				k += 1
-
-			if (j < 2):
-				print("values: ", values)
-				print("locations: ", locations)
-
-			if (values[index] == -1 and i == 0):
-				totalError += 1
-			if (values[index] == 1 and i == 1):
-				totalError += 1
-
-			j += 1
-		i += 1
-
-	return totalError/(len(dataPOS[0]) + len(dataNEG[0]))
 
 def handleTest(file):
 	f = open(file, 'r')
@@ -371,9 +375,12 @@ def handleTest(file):
 	error = ETest(dataPOS, dataNEG)
 	print("error: ", error)
 
+	plotOG(dataPOS, dataNEG)
+	plt.show()
+
 if __name__ == "__main__":
 	trainingNNPOS, trainingNNNEG, trainingHs = handleTrain("ZipDigits.train")
-	plt.clf()
+	#plt.clf()
 	handleTest("ZipDigits.test")
 
 
