@@ -7,9 +7,10 @@ import matplotlib.pyplot as plt
 from random import randint
 import random
 
-from NNOB import *
+from Point import *
+from PointHolder import *
 
-def normalizeFeatures(x1, y1, xN, yN):
+def normalizeFeatures(x1, xN, y1, yN):
 	minX = 10000
 	maxX = -10000
 	minY = 10000
@@ -52,7 +53,7 @@ def normalizeFeatures(x1, y1, xN, yN):
 		yN[i] = (yN[i]-valueToSubY)/(maxY/2)
 		i += 1 
 
-	return (x1, y1, xN, yN)
+	return (x1, xN, y1, yN)
 
 def getIntensity(trainingDigit):
 	intensity = 0
@@ -85,23 +86,28 @@ def getSymmetry(trainingDigit):
 		i += 1
 	return (xsymmetry+ysymmetry)
 
-def getData(numPoints):
+def getData(x1, xN, y1, yN):
 	pointData = PointHolder()
 	i = 0
-	while (i < numPoints):
-		x1 = random.uniform(0,1)
-		x2 = random.uniform(0,1)
-		pointData.addPoint(Point(x1, x2))
+	while (i < len(x1)):
+		pointData.addPoint(Point(x1[i], y1[i], 1))
+		i += 1
+	i = 0
+	while (i < len(xN)):
+		pointData.addPoint(Point(xN[i], yN[i], -1))
 		i += 1
 
 	return pointData
-	
+
 def runLloyds(points, numCenters, numPoints):
 	centerPoints = PointHolder()
 
 	#get center
 	randomCenter = points.getPoint(random.randint(0,numPoints))
+	print("rc: ", randomCenter.x1)
 	centerPoints.addPoint(randomCenter)
+	print("cplen: ", centerPoints.getLength())
+	print("points: ", (points.getPoint(1)).x1)
 	i = 1
 	while (i < numCenters):
 		newCenter = points.getNewCenter(centerPoints)
@@ -133,41 +139,22 @@ def runLloyds(points, numCenters, numPoints):
 	# 	i += 1
 	i = 0
 	while (i < len(groups)):
-		avgPoint = Point(groups[i].getAvg)
+		avgPoint = Point(groups[i].getAvgx1(), groups[i].getAvgx2(), 0)
+		avgPointHolder = PointHolder()
+		avgPointHolder.addPoint(avgPoint)
+		plot(avgPointHolder, 1)
 		i += 1
 
-
-def plot(points):
+def plot(points, type):
 	i = 0
 	while (i < points.getLength()):
-		plt.plot((points.getPoint(i)).x1, (points.getPoint(i)).x2, 'bo')
+		if (type == 0):
+			plt.plot((points.getPoint(i)).x1, (points.getPoint(i)).x2, 'bo')
+		if (type == 1):
+			plt.plot(float(points.getPoint(i).x1), float(points.getPoint(i).x2), 'ro')
 		i += 1
 
-def main():
-	numPoints = 200
-	numCenters = 10
-	data = getData(numPoints)
-
-	runLloyds(data, numCenters, numPoints)
-	
-	x1beg = 0
-	x1end = 1
-	x2beg = 0
-	x2end = 1
-
-	fig = plt.figure()
-	fig.suptitle('Clustering', fontsize = 20)
-	plt.xlabel('x1', fontsize = 18)
-	plt.ylabel('x2', fontsize = 18)
-	plt.legend(loc = 'upper right')
-	plt.axis([x1beg, x1end, x2beg, x2end])
-	plot(data)
-
-	plt.show()
-
-if __name__ == "__main__":
-	main()
-def handleTrain(file):
+def main(file):
 	f = open(file, 'r')
 
 	x1 = []
@@ -187,23 +174,31 @@ def handleTrain(file):
 			x1.append(getSymmetry(line))
 			y1.append(getIntensity(line))
 
-	print("lens: ", len(x1), len(xN))
+	numPoints = 300
+	numCenters = 10
+	x1, xN, y1, yN = normalizeFeatures(x1, xN, y1, yN)
 
-	#normalize features
-	x1, y1, xN, yN = normalizeFeatures(x1, y1, xN, yN)
-	dataPOS, dataNEG = getData(x1, y1, xN, yN)
+	data = getData(x1, xN, y1, yN)
+	print('here: ', data.getPoint(2).x1)
 
-if __name__ == "__main__":
-	trainingNNPOS, trainingNNNEG, trainingHs, kList, CVAnswer = handleTrain("ZipDigits.train")
-	#plt.clf()
-	#handleTest("ZipDigits.test")
+	x1beg = -1
+	x1end = 1
+	x2beg = -1
+	x2end = 1
 
 	fig = plt.figure()
-	plt.plot(kList, CVAnswer, 'ro', label='cv')
-	#plt.plot(LambdaList, EtestAnswer, 'bo', label='etest')
-	fig.suptitle('CV calculation', fontsize = 20)
-	plt.xlabel('k', fontsize = 18)
-	plt.ylabel('error', fontsize = 18)
+	fig.suptitle('Clustering', fontsize = 20)
+	plt.xlabel('x1', fontsize = 18)
+	plt.ylabel('x2', fontsize = 18)
 	plt.legend(loc = 'upper right')
-	plt.axis([0, 100, 0, 0.075])
+	plt.axis([x1beg, x1end, x2beg, x2end])
+
+
+	runLloyds(data, numCenters, len(x1) + len(xN))
+
+	plot(data, 0)
+
 	plt.show()
+
+if __name__ == "__main__":
+	main("ZipDigits.train")
