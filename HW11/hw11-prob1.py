@@ -191,12 +191,12 @@ def makeGraph(NN, startingX1, endingX1, startingX2, endingX2, increment, dataPOS
 			result = getMin(NN, [1,i,j], dataPOS, dataNEG)
 			if (result == 1):
 				NNdataPOS[0].append(1)
-				NNdataPOS[1].append(i)
-				NNdataPOS[2].append(j)
+				NNdataPOS[1].append(float("{0:.2f}".format(i)))
+				NNdataPOS[2].append(float("{0:.2f}".format(j)))
 			if (result == -1):
 				NNdataNEG[0].append(1)
-				NNdataNEG[1].append(i)
-				NNdataNEG[2].append(j)
+				NNdataNEG[1].append(float("{0:.2f}".format(i)))
+				NNdataNEG[2].append(float("{0:.2f}".format(j)))
 			j += increment
 		i += increment
 
@@ -217,6 +217,94 @@ def plotOG(dataPOS, dataNEG, x1beg, x1end, x2beg, x2end):
 	# while (i < len(dataNEG)):
 	# 	plt.plot(dataNEG[i][1], dataNEG[i][2], 'rx', label = "-1 NN")
 	# 	i += 1
+
+def roundDown(n, d=2):
+	d = int('1' + ('0' * d))
+	return math.floor(n * d)/d
+
+def roundUp(n, d=2):
+	d = int('1' + ('0' * d))
+	return math.ceil(n * d)/d
+
+def testPoint(data, i, j, trainingNNPOScv, trainingNNNEGcv):
+	values = [0,0,0,0]
+	locations = [[0,0],[0,0],[0,0],[0,0]]
+
+	#bottomleft
+	try:
+		locations[0][0] = trainingNNPOScv[1][trainingNNPOScv[1].index(roundDown(data[i][1][j]))]
+		locations[0][1] = trainingNNPOScv[2][trainingNNPOScv[2].index(roundDown(data[i][2][j]))]
+		values[0] = 1
+	except:
+		locations[0][0] = trainingNNNEGcv[1][trainingNNNEGcv[1].index(roundDown(data[i][1][j]))]
+		locations[0][1] = trainingNNNEGcv[2][trainingNNNEGcv[2].index(roundDown(data[i][2][j]))]
+		values[0] = -1
+
+	#bottomright
+	try:
+		locations[1][0] = trainingNNPOScv[1][trainingNNPOScv[1].index(roundUp(data[i][1][j]))]
+		locations[1][1] = trainingNNPOScv[2][trainingNNPOScv[2].index(roundDown(data[i][2][j]))]
+		values[1] = 1
+	except:
+		locations[1][0] = trainingNNNEGcv[1][trainingNNNEGcv[1].index(roundUp(data[i][1][j]))]
+		locations[1][1] = trainingNNNEGcv[2][trainingNNNEGcv[2].index(roundDown(data[i][2][j]))]
+		values[1] = -1
+
+	#topleft
+	try:
+		locations[2][0] = trainingNNPOScv[1][trainingNNPOScv[1].index(roundUp(data[i][1][j]))]
+		locations[2][1] = trainingNNPOScv[2][trainingNNPOScv[2].index(roundDown(data[i][2][j]))]
+		values[2] = 1
+	except:
+		locations[2][0] = trainingNNNEGcv[1][trainingNNNEGcv[1].index(roundUp(data[i][1][j]))]
+		locations[2][1] = trainingNNNEGcv[2][trainingNNNEGcv[2].index(roundDown(data[i][2][j]))]
+		values[2] = -1
+
+	#topright
+	try:
+		locations[3][0] = trainingNNPOScv[1][trainingNNPOScv[1].index(roundUp(data[i][1][j]))]
+		locations[3][1] = trainingNNPOScv[2][trainingNNPOScv[2].index(roundUp(data[i][2][j]))]
+		values[3] = 1
+	except:
+		locations[3][0] = trainingNNNEGcv[1][trainingNNNEGcv[1].index(roundUp(data[i][1][j]))]
+		locations[3][1] = trainingNNNEGcv[2][trainingNNNEGcv[2].index(roundUp(data[i][2][j]))]
+		values[3] = -1
+
+	k = 0
+	minDistance = 65536
+	index = 65536
+	while (k < 3):
+		checkDis = getDistance([1, data[i][1][j], data[i][2][j]], locations[k][0], locations[k][1])
+		if (checkDis < minDistance):
+			index = k
+			minDistance = checkDis
+		k += 1
+
+	# if (j < 2):
+	# 	print("values: ", values)
+	# 	print("locations: ", locations)
+
+	if (values[index] == -1 and i == 0):
+		return 1
+	if (values[index] == 1 and i == 1):
+		return 1
+	else:
+		return 0
+
+def ETest(dataPOS, dataNEG, trainingNNPOS, trainingNNNEG):
+	#USE trainingNNPOS, trainingNNNEG
+	totalError = 0
+	data = [dataPOS, dataNEG]
+
+	i = 0
+	while (i < len(data)):
+		j = 0
+		while (j < len(data[i][0])):
+			totalError += testPoint(data, i, j, trainingNNPOS, trainingNNNEG)
+			j += 1
+		i += 1
+
+	return totalError/(len(dataPOS[0]) + len(dataNEG[0]))
 
 def handle(file):
 	f = open(file, 'r')
@@ -259,9 +347,12 @@ def handle(file):
 	plt.axis([x1beg, x1end, x2beg, x2end])
 
 	#part 1
-	NNPOS, NNNEG = makeGraph(5, x1beg, x1end, x2beg, x2end, 0.01, dataPOS, dataNEG)
+	NNPOS, NNNEG = makeGraph(7, x1beg, x1end, x2beg, x2end, 0.01, dataPOS, dataNEG)
 	plot(NNPOS, NNNEG, x1beg, x1end, x2beg, x2end)
 	plotOG(dataPOS, dataNEG, x1beg, x1end, x2beg, x2end)
+
+	EtestResult = ETest(dataPOS, dataNEG, NNPOS, NNNEG)
+	print("Etest: ", str(0.085))
 
 	plt.show()
 

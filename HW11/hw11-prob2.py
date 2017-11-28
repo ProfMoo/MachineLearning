@@ -99,6 +99,42 @@ def getData(x1, xN, y1, yN):
 
 	return pointData
 
+def phi(x):
+	return(math.exp(-0.5*(x**2)))
+
+def getDistance(point1, point2):
+	return math.sqrt( ((point1.x1 - point2.x1)**2) + ((point1.x2 - point2.x2)**2) )
+
+def getPhiX(point, centers):
+	i = 0
+	phis = []
+	while (i < center.getLength()):
+		phis.append( phi( getDistance( point, centers.getPoint(i) ) / (2*math.sqrt(k) ) ) )
+		i += 1
+
+def getClassification(point, centers):
+	i = 0
+	while (i < centers.getLength()):
+		
+		i += 1
+
+'''
+for all data points, get a wlin
+get each point, put it into phi for each center, get a matrix
+then, get wtranspose phi(datapoint)
+sign of that is your classification
+'''
+
+def getWReg(points, lambdareg):
+	x_matrix, y_matrix = points.returnMatrix()
+	N = len(data[0])
+
+	x_matrix_trans = numpy.transpose(x_matrix)
+	regulation = lambdareg*numpy.identity(N)
+	wreg = numpy.linalg.inv(x_matrix_trans * x_matrix + regulation) * x_matrix_trans * numpy.transpose(y_matrix)
+
+	return wreg
+
 def runLloyds(points, numCenters, numPoints):
 	centerPoints = PointHolder()
 
@@ -139,7 +175,7 @@ def runLloyds(points, numCenters, numPoints):
 	# 	i += 1
 	i = 0
 	while (i < len(groups)):
-		avgPoint = Point(groups[i].getAvgx1(), groups[i].getAvgx2(), 0)
+		avgPoint = Point(groups[i].getAvgx1(), groups[i].getAvgx2(), groups[i].getAvgClass())
 		avgPointHolder = PointHolder()
 		avgPointHolder.addPoint(avgPoint)
 		plot(avgPointHolder, 1)

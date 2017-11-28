@@ -97,7 +97,6 @@ def legendreData(x1, y1, degree):
 
 	return singlePoint
 
-
 def getData8L(x1, y1, xN, yN):
 	databack = []
 	singledata = []

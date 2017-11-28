@@ -39,6 +39,17 @@ class PointHolder(object):
 
 		return addX2/self.getLength()
 
+	def getAvgClass(self):
+		i = 0
+		total = 0
+		while (i < self.getLength()):
+			total += (self.getPoint(i)).classification
+			i += 1
+
+		if (total < 0): return -1
+		if (total > 0): return 1
+		return 0
+
 	def getNewCenter(self, other):
 		i = 0
 		maxDistance = 0
@@ -56,6 +67,25 @@ class PointHolder(object):
 			i += 1
 			
 		return maxPoint
+
+	def returnMatrix(self):
+		i = 0
+		totalData = []
+		totalYs = []
+		while (i < self.getLength()):
+			singleData = []
+			point2get = self.getPoint(i)
+			singleData.append(1)
+			singleData.append(point2get.x1)
+			singleData.append(point2get.x2)
+			totalData.append(singleData)
+			totalYs.append(point2get.classification)
+			i += 1
+
+		x_matrix = numpy.matrix(totalData)
+		y_matrix = numpy.matrix(y_matrix)
+
+		return(x_matrix, y_matrix)
 
 def getDistance(point1, point2):
 	# print(point1)
