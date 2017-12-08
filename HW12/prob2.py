@@ -173,22 +173,35 @@ def gradient_descent_point(point, W, final):
 		GXn[i] = X[i-1]*np.transpose(D[i])
 		i += 1
 
-	EinXn = (X[len(X)-1].item(0,0) - point.classification)**2
+	EinXn = 0
+	#print("pls: ", X[len(X)-1].item(0,0))
+	# if ((X[len(X)-1].item(0,0)) > 0):
+	# 	if (point.classification == -1):
+	# 		EinXn = 1
+	# if ((X[len(X)-1].item(0,0)) <= 0):
+	# 	#print("HERE: ", X[len(X)-1].item(0,0))
+	# 	if (point.classification == 1):
+	# 		EinXn = 1
+	EinXn = ((X[len(X)-1].item(0,0)) - point.classification)**2
 
 	return (GXn, EinXn)
 
 def gradient_descent(points, W, final):
 	#initialize gradient
 
-	eta = 0.01
-	beta = -0.08
-	alpha = 1.03
+	eta = 0.1
+	beta = 0.75
+	alpha = 1.05
 
-	num_iter = 400
-	previous_Ein = 0
+	num_iter = 50
+	#previous_Ein = 0
+	#Ein = 0
 	Ein = 0
 	Ein_list = list()
 	num_iter_list = list()
+
+	current_W = W[:]
+	next_W = W[:]
 
 	#do first iter to get G
 	G = [0,0,0]
@@ -203,6 +216,8 @@ def gradient_descent(points, W, final):
 		Ein += (1/points.getLength())*EinXn
 		j += 1
 
+	print("ein: ", Ein)
+
 	i = 0
 	while (i < num_iter):
 		#printing
@@ -210,7 +225,9 @@ def gradient_descent(points, W, final):
 			print("num_iter: ", i)
 
 		#make new weights to test
-		previous_W = W[:]
+
+		current_W = W[:]
+		next_W = W[:]
 
 		V = list()
 		j = 0
@@ -218,19 +235,18 @@ def gradient_descent(points, W, final):
 			V.append(np.negative(G[j]))
 			j += 1 	
 		j = 0
-		while (j < len(W)):
-			W[j] = np.add(W[j], eta*V[j])
+		while (j < len(next_W)):
+			next_W[j] = np.add(current_W[j], eta*V[j])
 			j += 1
-		#updates on bad Gs no matter what!!!
 
-		previous_G = G[:]
+		current_G = G[:]
 		G = [0,0,0]
-		previous_Ein = Ein
+		current_Ein = Ein
 		Ein = 0
 		j = 0
 		while (j < points.getLength()):
 			point = points.getPoint(j)
-			GXn, EinXn = gradient_descent_point(point, W, final)
+			GXn, EinXn = gradient_descent_point(point, next_W, final)
 			k = 1
 			while (k < len(G)):
 				G[k] += (1/points.getLength())*GXn[k]
@@ -242,22 +258,44 @@ def gradient_descent(points, W, final):
 			num_iter_list.append(i)
 			Ein_list.append(Ein)
 
-		if (Ein < previous_Ein):
+		if (Ein < current_Ein):
+			
+			W = next_W[:]
 			eta = alpha*eta
 
-		if (Ein >= previous_Ein):
-			print("BAD")
-			W = previous_W[:]
-			G = previous_G[:]
+		if (Ein >= current_Ein):
+			W = current_W[:]
+			G = current_G[:]
+			print("Ein: ", Ein)
 			eta = beta*eta
 
 		i += 1
 
-	print("num_iter_list ", num_iter_list)
-	print("Ein: ", Ein_list)
-	return(num_iter_list, Ein_list)
-	#get final GD
+	return(num_iter_list, Ein_list, W)
 
+def makeGraph(W, starting_x1, ending_x1, starting_x2, ending_x2, increment, points):
+	NNpoints = PointHolder()
+
+	#looping through all locations in NN graph
+	i = starting_x1
+	while (i < ending_x1):
+		# if (i%1 < 0.01):
+		# 	print("i: ", i)
+		j = starting_x2
+		while (j < ending_x2):
+			new_point = Point(0, i, j)
+			new_s, new_x = forward_prop(new_point, W, tanh)
+			result = new_x[len(new_x)-1].item(0, 0)
+			#print("result" , result)
+			#print("newpoint: ", new_point)
+			if (result > 0):
+				NNpoints.addPoint(Point(i, j, 1))
+			if (result <= 0):
+				NNpoints.addPoint(Point(i, j, -1))
+			j += increment
+		i += increment
+
+	return (NNpoints)
 
 def get_data():
 	f = open("ZipDigits.train", 'r')
@@ -285,11 +323,6 @@ def get_data():
 	return points
 
 def plot_points(points):
-	fig = plt.figure()
-	fig.suptitle('digits', fontsize = 20)
-	plt.xlabel('asymmetry', fontsize = 18)
-	plt.ylabel('intensity', fontsize = 18)
-
 	i = 0
 	while (i < points.getLength()):
 		currentPoint = points.getPoint(i)
@@ -299,9 +332,30 @@ def plot_points(points):
 			plt.plot(currentPoint.x1, currentPoint.x2, 'rx')
 		i += 1
 
+def plot_test(points, W):
+	i = 0
+	while (i < points.getLength()):
+		currentPoint = points.getPoint(i)
+		result_s, result_x = forward_prop(currentPoint, W, identity)
+		result_x = result_x[len(result_x)-1].item(0,0)
+		if (result_x > 0):
+			plt.plot(currentPoint.x1, currentPoint.x2, color = "#99CCFF", linestyle = 'none', marker = 'o', label = "1")
+		if (result_x <= 0):
+			plt.plot(currentPoint.x1, currentPoint.x2, color = "#FF9999", linestyle = 'none', marker = 'x', label = "-1")
+		i += 1
+
+def plot(NNpoints):
+	i = 0
+	while (i < NNpoints.getLength()):
+		currentPoint = NNpoints.getPoint(i)
+		if (currentPoint.classification == 1):
+			plt.plot(currentPoint.x1, currentPoint.x2, color = "#99CCFF", linestyle = 'none', marker = 'x', label = "1")
+		elif (currentPoint.classification == -1):
+			plt.plot(currentPoint.x1, currentPoint.x2, color = "#FF9999", linestyle = 'none', marker = 'x', label = "-1")
+		i += 1
+
 def main():
 	points = get_data()
-	#plot_points(points)
 
 	# x1 = np.matrix('1;1;1')
 	# y = 1
@@ -315,13 +369,34 @@ def main():
 	y = 1
 	starting_weights = list()
 	starting_weights.append(np.matrix(0))
-	starting_weights.append(np.matrix('0.25 0.25; 0.25 0.25; 0.25 0.25'))
-	starting_weights.append(np.matrix('0.25; 0.25; 0.25'))	
+	starting_weights.append(np.matrix('0.01 -0.01; 0.01 -0.01; 0.01 -0.01'))
+	starting_weights.append(np.matrix('0.01; 0.01; -0.01'))	
 	print("tanh")
-	num_iter_list, Ein_list = gradient_descent(points, starting_weights, tanh)
+	num_iter_list, Ein_list, W = gradient_descent(points, starting_weights, identity)
+	print("num_iter_list ", num_iter_list)
+	print("Ein: ", Ein_list)
 
-	plt.plot(num_iter_list, Ein_list, 'bo')
+	#plt.plot(num_iter_list, Ein_list, 'bo')
 
+	#using W, get a decision boundary
+	x1_beg = -1.1
+	x1_end = 1.1
+	x2_beg = -1.1
+	x2_end = 1.1
+	#NNpoints = makeGraph(W, x1_beg, x1_end, x2_beg, x2_end, 0.01, points)
+
+	fig = plt.figure()
+	fig.suptitle('digits', fontsize = 20)
+	plt.xlabel('asymmetry', fontsize = 18)
+	plt.ylabel('intensity', fontsize = 18)
+
+	#plot(NNpoints)	
+	plot_points(points)
+
+	plt.show()
+	plt.clf()
+
+	plot_test(points, W)
 	plt.show()
 
 if __name__ == "__main__":
