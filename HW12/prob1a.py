@@ -15,11 +15,12 @@ def tanhprime(x):
 	return 1
 
 def forward_prop(x1, y, W):
-	i = 0
 	S = list()
 	X = list()
 	X.append(x1)
 	vec_op = np.vectorize(tanh)
+
+	i = 0
 	while (i < len(W)):
 		S.append(np.dot(np.transpose(W[i]), X[i]))
 		vec_matrix = vec_op(S[i])
@@ -30,21 +31,34 @@ def forward_prop(x1, y, W):
 
 def backward_prop(S, X, W, y):
 	D = list()
-	D.append( 2 * (X[0].item(0,0) - y) * tanhprime(S[len(S)-1]))
-	i = 0
-	while (i < len(W)):
-		#need two loops in here
+	D.append(np.matrix( 2 * (X[0].item(0,0) - y) * tanhprime(S[len(S)-1]) ) )
+	print("D: ", D)
+	vec_op = np.vectorize(tanhprime)
 
-		#get theta prime here
-		#get sensitivty here and append 
-		i += 1
+	i = len(W)-1
+	print("i: ", i)
+	while (i > 0):
+		#make theta
+		theta = (vec_op(X[i]))[0:2]
+		print(theta)
+		
+		#get sensitivity
+		print("W[i]: ", W[i])
+		print("D[i-1]: ", D[i-1])
+		sensitivity = np.multiply(theta, (np.dot(W[i], D[i-1]))[0:2])
+		D.insert(0, sensitivity)
+		i -= 1
+
+	return D
 
 def gradient_descent(x1, y, W):
 	S, X = forward_prop(x1, y, W)
 	print("S: ", S)
 	print("X: ", X)
 	print("W: ", W)
-	backward_prop(S, X, W, y)
+	D = backward_prop(S, X, W, y)
+
+	print("D: ", D)
 
 def main():
 	x1 = np.matrix('1;1;1')

@@ -351,11 +351,43 @@ def handle(file):
 	plot(NNPOS, NNNEG, x1beg, x1end, x2beg, x2end)
 	plotOG(dataPOS, dataNEG, x1beg, x1end, x2beg, x2end)
 
-	EtestResult = ETest(dataPOS, dataNEG, NNPOS, NNNEG)
-	print("Etest: ", str(0.085))
+	EinResult = ETest(dataPOS, dataNEG, NNPOS, NNNEG)
+	print("Ein: ", EinResult)
 
-	plt.show()
+	return(dataPOS, dataNEG, NNPOS, NNNEG)
+
+def handleTest(file, NNPOSTEST, NNNEGTEST):
+	f = open(file, 'r')
+
+	x1 = []
+	y1 = []
+	xN = []
+	yN = []
+
+	for line in f:
+		line = line.split(' ')
+		if (line[0] != '1.0000'):
+			line = line[1:-1]
+			xN.append(getSymmetry(line))
+			yN.append(getIntensity(line))
+		if (line[0] == '1.0000'):
+			line = line[1:-1]
+			x1.append(getSymmetry(line))
+			y1.append(getIntensity(line))
+
+	print("lens: ", len(x1), len(xN))
+
+	#normalize features
+	x1, y1, xN, yN = normalizeFeatures(x1, y1, xN, yN)
+	dataPOSTEST, dataNEGTEST = getData(x1, y1, xN, yN)
+
+	print("len(data): ", len(dataPOSTEST[0]), len(dataNEGTEST[0]))
+
+	EtestResult = ETest(dataPOSTEST, dataNEGTEST, NNPOSTEST, NNNEGTEST)
+	print("Etest: ", EtestResult)
+
 
 if __name__ == "__main__":
-	handle("ZipDigits.train")
-
+	dataPOS, dataNEG, NNPOS, NNNEG = handle("ZipDigits.train")
+	handleTest("ZipDigits.test", NNPOS, NNNEG)
+	plt.show()

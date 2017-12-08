@@ -115,7 +115,7 @@ def getPhiX(point, centers):
 def getClassification(point, centers):
 	i = 0
 	while (i < centers.getLength()):
-		
+
 		i += 1
 
 '''
@@ -125,7 +125,7 @@ then, get wtranspose phi(datapoint)
 sign of that is your classification
 '''
 
-def getWReg(points, lambdareg):
+def getWReg(points, lambdareg): 
 	x_matrix, y_matrix = points.returnMatrix()
 	N = len(data[0])
 
