@@ -157,7 +157,7 @@ def backward_prop(S, X, W, point, final):
 	D.insert(0, np.matrix(0))
 	return D
 
-def gradient_descent_point(point, W, G, final):
+def gradient_descent_point(point, W, final):
 	S, X = forward_prop(point, W, final)
 	# print("S: ", S)
 	# print("X: ", X)
@@ -179,30 +179,85 @@ def gradient_descent_point(point, W, G, final):
 
 def gradient_descent(points, W, final):
 	#initialize gradient
-	G = [0,0,0]
+
+	eta = 0.01
+	beta = -0.08
+	alpha = 1.03
+
+	num_iter = 400
+	previous_Ein = 0
 	Ein = 0
+	Ein_list = list()
+	num_iter_list = list()
+
+	#do first iter to get G
+	G = [0,0,0]
+	j = 0
+	while (j < points.getLength()):
+		point = points.getPoint(j)
+		GXn, EinXn = gradient_descent_point(point, W, final)
+		k = 1
+		while (k < len(G)):
+			G[k] += (1/points.getLength())*GXn[k]
+			k += 1
+		Ein += (1/points.getLength())*EinXn
+		j += 1
 
 	i = 0
-	while (i < points.getLength()):
-		point = points.getPoint(i)
-		GXn, EinXn = gradient_descent_point(point, W, G, final)
-		j = 1
+	while (i < num_iter):
+		#printing
+		if (i%50 == 0):
+			print("num_iter: ", i)
+
+		#make new weights to test
+		previous_W = W[:]
+
+		V = list()
+		j = 0
 		while (j < len(G)):
-			G[j] += (1/points.getLength())*GXn[j]
+			V.append(np.negative(G[j]))
+			j += 1 	
+		j = 0
+		while (j < len(W)):
+			W[j] = np.add(W[j], eta*V[j])
 			j += 1
-		Ein += (1/points.getLength())*EinXn
+		#updates on bad Gs no matter what!!!
+
+		previous_G = G[:]
+		G = [0,0,0]
+		previous_Ein = Ein
+		Ein = 0
+		j = 0
+		while (j < points.getLength()):
+			point = points.getPoint(j)
+			GXn, EinXn = gradient_descent_point(point, W, final)
+			k = 1
+			while (k < len(G)):
+				G[k] += (1/points.getLength())*GXn[k]
+				k += 1
+			Ein += (1/points.getLength())*EinXn
+			j += 1
+
+		if (i%10 == 0):
+			num_iter_list.append(i)
+			Ein_list.append(Ein)
+
+		if (Ein < previous_Ein):
+			eta = alpha*eta
+
+		if (Ein >= previous_Ein):
+			print("BAD")
+			W = previous_W[:]
+			G = previous_G[:]
+			eta = beta*eta
+
 		i += 1
 
-	print("G: ", G)
-	print("Ein: ", Ein)
+	print("num_iter_list ", num_iter_list)
+	print("Ein: ", Ein_list)
+	return(num_iter_list, Ein_list)
 	#get final GD
 
-	#then, update weights, reset GD
-
-	#run again
-	
-
-	#while loop, calling point for GD
 
 def get_data():
 	f = open("ZipDigits.train", 'r')
@@ -246,7 +301,7 @@ def plot_points(points):
 
 def main():
 	points = get_data()
-	plot_points(points)
+	#plot_points(points)
 
 	# x1 = np.matrix('1;1;1')
 	# y = 1
@@ -263,7 +318,9 @@ def main():
 	starting_weights.append(np.matrix('0.25 0.25; 0.25 0.25; 0.25 0.25'))
 	starting_weights.append(np.matrix('0.25; 0.25; 0.25'))	
 	print("tanh")
-	gradient_descent(points, starting_weights, tanh)
+	num_iter_list, Ein_list = gradient_descent(points, starting_weights, tanh)
+
+	plt.plot(num_iter_list, Ein_list, 'bo')
 
 	plt.show()
 
