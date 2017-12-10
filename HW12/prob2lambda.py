@@ -193,7 +193,7 @@ def gradient_descent(points, W, final):
 	beta = 0.75
 	alpha = 1.05
 
-	num_iter = 1000000
+	num_iter = 1000
 	#previous_Ein = 0
 	#Ein = 0
 	Ein = 0
@@ -381,18 +381,16 @@ def main():
 	plt.xlabel('Iterations', fontsize = 18)
 	plt.ylabel('Ein', fontsize = 18)
 	plt.plot(num_iter_list, Ein_list, 'bo')
-	
-	x1_beg = -1.1
-	x1_end = 1.1
-	x2_beg = -1.1
-	x2_end = 1.1
-	NNpoints = makeGraph(W, x1_beg, x1_end, x2_beg, x2_end, 0.01, points)
-
 	plt.show()
 	plt.clf()
 	plt.cla()
 
 	#using W, get a decision boundary
+	x1_beg = -1.1
+	x1_end = 1.1
+	x2_beg = -1.1
+	x2_end = 1.1
+	NNpoints = makeGraph(W, x1_beg, x1_end, x2_beg, x2_end, 0.01, points)
 
 	fig = plt.figure()
 	fig.suptitle('digits', fontsize = 20)
