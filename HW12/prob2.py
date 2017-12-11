@@ -193,7 +193,7 @@ def gradient_descent(points, W, final):
 	beta = 0.75
 	alpha = 1.05
 
-	num_iter = 1000000
+	num_iter = 10000
 	#previous_Ein = 0
 	#Ein = 0
 	Ein = 0
@@ -373,6 +373,7 @@ def main():
 	starting_weights.append(np.matrix('0.01; 0.01; -0.01'))	
 	print("tanh")
 	num_iter_list, Ein_list, W = gradient_descent(points, starting_weights, identity)
+	print("W: ", W)
 	print("num_iter_list ", num_iter_list)
 	print("Ein: ", Ein_list)
 
@@ -410,3 +411,12 @@ def main():
 
 if __name__ == "__main__":
 	main()
+
+	'''
+	10000 iter W:
+	W:  [matrix([[ 0.]]), matrix([[ 3.89664268, -3.89664268],
+        [ 6.59767342, -6.59767342],
+        [ 1.45769226, -1.45769226]]), matrix([[ 0.0056534 ],
+        [-0.51060269],
+        [ 0.51060269]])]
+	'''

@@ -157,37 +157,25 @@ def backward_prop(S, X, W, point, final):
 	D.insert(0, np.matrix(0))
 	return D
 
-def gradient_descent_point(point, W, final):
+def gradient_descent_point(point, W, final, lamb, num):
 	S, X = forward_prop(point, W, final)
-	# print("S: ", S)
-	# print("X: ", X)
-	# print("W: ", W)
 	D = backward_prop(S, X, W, point, final)
-	# print("D: ", D)
 
-	#compute gradient
 	GXn = [0,0,0]
-
 	i = 1
 	while (i < len(X)):
-		GXn[i] = X[i-1]*np.transpose(D[i])
+		##GXn[i] = X[i-1]*np.transpose(D[i])
+		GXn[i] = (X[i-1]*np.transpose(D[i])) + ( (2 * lamb) / ( num * W[i] ) )
 		i += 1
 
-	EinXn = 0
-	#print("pls: ", X[len(X)-1].item(0,0))
-	# if ((X[len(X)-1].item(0,0)) > 0):
-	# 	if (point.classification == -1):
-	# 		EinXn = 1
-	# if ((X[len(X)-1].item(0,0)) <= 0):
-	# 	#print("HERE: ", X[len(X)-1].item(0,0))
-	# 	if (point.classification == 1):
-	# 		EinXn = 1
 	EinXn = ((X[len(X)-1].item(0,0)) - point.classification)**2
 
 	return (GXn, EinXn)
 
 def gradient_descent(points, W, final):
 	#initialize gradient
+	num = points.getLength()
+	lamb = 0.01
 
 	eta = 0.1
 	beta = 0.75
@@ -195,7 +183,6 @@ def gradient_descent(points, W, final):
 
 	num_iter = 1000
 	#previous_Ein = 0
-	#Ein = 0
 	Ein = 0
 	Ein_list = list()
 	num_iter_list = list()
@@ -208,7 +195,7 @@ def gradient_descent(points, W, final):
 	j = 0
 	while (j < points.getLength()):
 		point = points.getPoint(j)
-		GXn, EinXn = gradient_descent_point(point, W, final)
+		GXn, EinXn = gradient_descent_point(point, W, final, lamb, num)
 		k = 1
 		while (k < len(G)):
 			G[k] += (1/points.getLength())*GXn[k]

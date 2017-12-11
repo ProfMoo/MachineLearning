@@ -112,18 +112,18 @@ def organize_data(x1, y1, xN, yN):
 
 	return points
 
-def forward_prop(x1, y, W, final):
+def forward_prop(point, W, final):
 	S = list()
 	X = list()
-	X.append(x1)
+	X.append(np.matrix([[1], [point.x1], [point.x2]]))
 	vec_op = np.vectorize(tanh)
 	vec_op_final = np.vectorize(final)
 
 	i = 0
-	while (i < len(W)):
-		S.append(np.dot(np.transpose(W[i]), X[i]))
+	while (i < len(W)-1):
+		S.append(np.dot(np.transpose(W[i+1]), X[i]))
 		#print("S[i]: ", S[i])
-		if (i == len(W) - 1):
+		if (i == len(W)-2):
 			vec_matrix = vec_op_final(S[i])
 		else: 
 			vec_matrix = vec_op(S[i])
@@ -132,62 +132,35 @@ def forward_prop(x1, y, W, final):
 		i += 1
 
 	S.insert(0, np.matrix(0))
-	W.insert(0, np.matrix(0))
 	X[len(X)-1] = X[len(X)-1][1:]
 	return(S, X)
 
-def backward_prop(S, X, W, y, final):
-	D = list()
-	vec_op = np.vectorize(tanhprime)
-	if (final == identity):
-		vec_op_final = np.vectorize(one)
-	else:
-		vec_op_final = np.vectorize(tanhprime)
-	D.append(np.matrix( 2 * (X[len(X)-1].item(0,0) - y) * (vec_op_final(X[len(X)-1]) ) ) )
+def makeGraph(W, starting_x1, ending_x1, starting_x2, ending_x2, increment):
+	NNpoints = PointHolder()
 
-	i = len(S)-2
-	while (i > 0):
-		#make theta
-		theta = np.matrix((vec_op(X[i]))[1:])
-		
-		#get sensitivity
-		sensitivity = np.multiply(theta, (np.dot(W[i+1], D[i-1]))[1:])
-		D.insert(0, sensitivity)
-		i -= 1
+	#looping through all locations in NN graph
+	i = starting_x1
+	while (i < ending_x1):
+		# if (i%1 < 0.01):
+		# 	print("i: ", i)
+		j = starting_x2
+		while (j < ending_x2):
+			new_point = Point(i, j, 0)
+			new_s, new_x = forward_prop(new_point, W, tanh)
+			result = new_x[len(new_x)-1].item(0, 0)
+			#print("result" , result)
+			#print("newpoint: ", new_point)
+			if (result > 0):
+				NNpoints.addPoint(Point(i, j, 1))
+			if (result <= 0):
+				NNpoints.addPoint(Point(i, j, -1))
+			j += increment
+		i += increment
 
-	D.insert(0, np.matrix(0))
-	return D
-
-def gradient_descent_point(x1, y, W, G, final):
-	S, X = forward_prop(x1, y, W, final)
-	print("S: ", S)
-	print("X: ", X)
-	print("W: ", W)
-	D = backward_prop(S, X, W, y, final)
-	print("D: ", D)
-
-	#compute gradient
-	GXn = [0,0,0]
-
-	i = 1
-	while (i < len(X)):
-		GXn[i] = (1/300)*(X[i-1]*np.transpose(D[i]))
-		i += 1
-
-	print("GXn: ", GXn)
-
-def gradient_descent(x1, y, W, final):
-	#initialize gradient
-	G = [0,0]
-
-	i = 0
-	
-	gradient_descent_point(x1, y, W, G, final)
-
-	#while loop, calling point for GD
+	return (NNpoints)
 
 def get_data():
-	f = open("ZipDigits.train", 'r')
+	f = open("ZipDigits.test", 'r')
 
 	x1 = []
 	y1 = []
@@ -212,11 +185,6 @@ def get_data():
 	return points
 
 def plot_points(points):
-	fig = plt.figure()
-	fig.suptitle('digits', fontsize = 20)
-	plt.xlabel('asymmetry', fontsize = 18)
-	plt.ylabel('intensity', fontsize = 18)
-
 	i = 0
 	while (i < points.getLength()):
 		currentPoint = points.getPoint(i)
@@ -226,27 +194,71 @@ def plot_points(points):
 			plt.plot(currentPoint.x1, currentPoint.x2, 'rx')
 		i += 1
 
+def plot_test(points, W):
+	i = 0
+	error = 0
+	while (i < points.getLength()):
+		currentPoint = points.getPoint(i)
+		result_s, result_x = forward_prop(currentPoint, W, identity)
+		result_x = result_x[len(result_x)-1].item(0,0)
+		if (result_x > 0 and currentPoint.classification == -1):
+			error += 1
+		if (result_x <= 0 and currentPoint.classification == 1):
+			error += 1
+		#if (result_x > 0):
+			#plt.plot(currentPoint.x1, currentPoint.x2, color = "#99CCFF", linestyle = 'none', marker = 'o', label = "1")
+		#if (result_x <= 0):
+			#plt.plot(currentPoint.x1, currentPoint.x2, color = "#FF9999", linestyle = 'none', marker = 'x', label = "-1")
+		i += 1
+
+	print("Error: ", error/points.getLength())
+
+def plot(NNpoints):
+	i = 0
+	while (i < NNpoints.getLength()):
+		currentPoint = NNpoints.getPoint(i)
+		if (currentPoint.classification == 1):
+			plt.plot(currentPoint.x1, currentPoint.x2, color = "#99CCFF", linestyle = 'none', marker = 'x', label = "1")
+		elif (currentPoint.classification == -1):
+			plt.plot(currentPoint.x1, currentPoint.x2, color = "#FF9999", linestyle = 'none', marker = 'x', label = "-1")
+		i += 1
+
 def main():
 	points = get_data()
+
+	W = [np.matrix([[ 0.]]), np.matrix([[ 3.89664268, -3.89664268],
+        [ 6.59767342, -6.59767342],
+        [ 1.45769226, -1.45769226]]), np.matrix([[ 0.0056534 ],
+        [-0.51060269],
+        [ 0.51060269]])]
+	
+	x1_beg = -1.1
+	x1_end = 1.1
+	x2_beg = -1.1
+	x2_end = 1.1
+	NNpoints = makeGraph(W, x1_beg, x1_end, x2_beg, x2_end, 0.01)
+
+
+	#using W, get a decision boundary
+
+	fig = plt.figure()
+	fig.suptitle('digits', fontsize = 20)
+	plt.xlabel('asymmetry', fontsize = 18)
+	plt.ylabel('intensity', fontsize = 18)
+
+	plot(NNpoints)	
 	plot_points(points)
-
-	x1 = np.matrix('1;1;1')
-	y = 1
-	starting_weights = list()
-	starting_weights.append(np.matrix('0.2501 0.2501; 0.2501 0.2501; 0.2501 0.2501'))
-	starting_weights.append(np.matrix('0.2501; 0.2501; 0.2501'))	
-	print("identity")
-	gradient_descent(x1, y, starting_weights, identity)
-
-	x1 = np.matrix('1;1;1')
-	y = 1
-	starting_weights = list()
-	starting_weights.append(np.matrix('0.2501 0.2501; 0.2501 0.2501; 0.2501 0.2501'))
-	starting_weights.append(np.matrix('0.2501; 0.2501; 0.2501'))	
-	print("tanh")
-	gradient_descent(x1, y, starting_weights, tanh)
-
+	plot_test(points)
 	plt.show()
 
 if __name__ == "__main__":
 	main()
+
+	'''
+	10000 iter W:
+	W:  [matrix([[ 0.]]), matrix([[ 3.89664268, -3.89664268],
+        [ 6.59767342, -6.59767342],
+        [ 1.45769226, -1.45769226]]), matrix([[ 0.0056534 ],
+        [-0.51060269],
+        [ 0.51060269]])]
+	'''
