@@ -248,7 +248,7 @@ def main():
 
 	plot(NNpoints)	
 	plot_points(points)
-	plot_test(points)
+	plot_test(points, W)
 	plt.show()
 
 if __name__ == "__main__":

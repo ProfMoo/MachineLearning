@@ -171,7 +171,7 @@ def gradient_descent_point(x1, y, W, G, final):
 
 	i = 1
 	while (i < len(X)):
-		GXn[i] = (1/300)*(X[i-1]*np.transpose(D[i]))
+		GXn[i] = (X[i-1]*np.transpose(D[i]))
 		i += 1
 
 	print("GXn: ", GXn)
