@@ -33,24 +33,34 @@ def qp():
 
 def check_func(b, W, point):
 	check_num = np.dot( np.transpose(np.matrix([[W[0]], [W[1]]])), np.matrix([[point.x1], [point.x2]]) ) + b
-	if (check_num > 0.01):
+	if (check_num > 0.001):
 		return 1
-	if (check_num < -0.01):
+	if (check_num < -0.001):
 		return -1
 	return 0
 
-def make_chart(b, W, x1_beg, x1_end, x2_beg, x2_end, increment):
+def check_func_Z(b, W, point):
+	check_num = np.dot( np.transpose(np.matrix([[W[0]], [W[1]]])), np.matrix([[point.x1**3-point.x2], [point.x1*point.x2]]) ) + b
+	if (check_num > 0.02):
+		return 1
+	if (check_num < -0.02):
+		return -1
+	return 0
+
+def make_chart(b, W, x1_beg, x1_end, x2_beg, x2_end, increment, type_func):
 	SVM_points = PointHolder()
 
 	#looping through all locations in NN graph
 	i = x1_beg
 	while (i < x1_end):
-		# if (i%1 < 0.01):
-		# 	print("i: ", i)
 		j = x2_beg
 		while (j < x2_end):
 			new_point = Point(i, j, 0)
-			answer = check_func(b, W, new_point)
+
+			if (type_func == "X"):
+				answer = check_func(b, W, new_point)
+			if (type_func == "Z"):
+				answer = check_func_Z(b, W, new_point)
 
 			if (answer > 0):
 				SVM_points.addPoint(Point(i, j, 1))
@@ -75,16 +85,32 @@ def plot(SVM_points):
 			plt.plot(currentPoint.x1, currentPoint.x2, color = "#000000", linestyle = 'none', marker = 'x', label = "0")
 		i += 1
 
+def plot_points(points):
+	i = 0
+	while (i < points.getLength()):
+		currentPoint = points.getPoint(i)
+		if (currentPoint.classification == 1):
+			plt.plot(currentPoint.x1, currentPoint.x2, 'bo')
+		elif (currentPoint.classification == -1):
+			plt.plot(currentPoint.x1, currentPoint.x2, 'rx')
+		i += 1
+
 def main():
 	b, W = qp()
 
-	x1_beg = -1.1
-	x1_end = 1.1
-	x2_beg = -1.1
-	x2_end = 1.1
-	SVM_points = make_chart(b, W, x1_beg, x1_end, x2_beg, x2_end, 0.1)
+	x1_beg = -1.0
+	x1_end = 1.0
+	x2_beg = -1.0
+	x2_end = 1.0
+	type_func = "Z"
+	SVM_points = make_chart(b, W, x1_beg, x1_end, x2_beg, x2_end, 0.025, type_func)
 
 	plot(SVM_points)
+
+	points = PointHolder()
+	points.addPoint(Point(1, 0, 1))
+	points.addPoint(Point(-1, 0, -1))
+	plot_points(points)
 	plt.show()
 
 if __name__ == "__main__":
