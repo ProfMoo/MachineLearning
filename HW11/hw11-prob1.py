@@ -349,7 +349,7 @@ def handle(file):
 	#part 1
 	NNPOS, NNNEG = makeGraph(7, x1beg, x1end, x2beg, x2end, 0.01, dataPOS, dataNEG)
 	plot(NNPOS, NNNEG, x1beg, x1end, x2beg, x2end)
-	plotOG(dataPOS, dataNEG, x1beg, x1end, x2beg, x2end)
+	#plotOG(dataPOS, dataNEG, x1beg, x1end, x2beg, x2end)
 
 	EinResult = ETest(dataPOS, dataNEG, NNPOS, NNNEG)
 	print("Ein: ", EinResult)
@@ -385,6 +385,12 @@ def handleTest(file, NNPOSTEST, NNNEGTEST):
 
 	EtestResult = ETest(dataPOSTEST, dataNEGTEST, NNPOSTEST, NNNEGTEST)
 	print("Etest: ", EtestResult)
+
+	x1beg = -1.2
+	x1end = 1.2
+	x2beg = -1.2
+	x2end = 1.2
+	plotOG(dataPOSTEST, dataNEGTEST, x1beg, x1end, x2beg, x2end)
 
 
 if __name__ == "__main__":
