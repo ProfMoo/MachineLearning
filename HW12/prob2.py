@@ -174,14 +174,6 @@ def gradient_descent_point(point, W, final):
 		i += 1
 
 	EinXn = 0
-	#print("pls: ", X[len(X)-1].item(0,0))
-	# if ((X[len(X)-1].item(0,0)) > 0):
-	# 	if (point.classification == -1):
-	# 		EinXn = 1
-	# if ((X[len(X)-1].item(0,0)) <= 0):
-	# 	#print("HERE: ", X[len(X)-1].item(0,0))
-	# 	if (point.classification == 1):
-	# 		EinXn = 1
 	EinXn = ((X[len(X)-1].item(0,0)) - point.classification)**2
 
 	return (GXn, EinXn)
@@ -387,7 +379,7 @@ def main():
 	x1_end = 1.1
 	x2_beg = -1.1
 	x2_end = 1.1
-	NNpoints = makeGraph(W, x1_beg, x1_end, x2_beg, x2_end, 0.01, points)
+	NNpoints = makeGraph(W, x1_beg, x1_end, x2_beg, x2_end, 0.1, points)
 
 	plt.show()
 	plt.clf()

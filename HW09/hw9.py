@@ -189,7 +189,7 @@ def lp(k, x):
 	return firstTerm - secondTerm 
 
 if __name__ == "__main__":
-	f = open("ZipDigits.train", 'r')
+	f = open("ZipDigits.test", 'r')
 
 	pocketTop = 500
 	x1 = []
@@ -237,7 +237,7 @@ if __name__ == "__main__":
 	fig = plt.figure()
 	plt.plot(xN, yN, 'rx')
 	plt.plot(x1, y1, 'bo')
-	contourPlot(x1, y1, xN, yN)
+	#contourPlot(x1, y1, xN, yN)
 	
 	#calculate Ein
 	Ein = EinCalc(data, ys, wregdone)
