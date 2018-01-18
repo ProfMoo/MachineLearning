@@ -182,10 +182,10 @@ def main():
 		else:
 			graphR_x.append(x_it)
 			graphR_y.append(y_it)
-		y_it += .02
+		y_it += .006
 		if y_it >= 1:
 			y_it = -1
-			x_it += .02
+			x_it += .006
 
 	t1, t2, t3, t4, etest = get_etest(clf)
 	print("etest: ", etest)
@@ -194,15 +194,15 @@ def main():
 	plt.xlabel('asymmetry')
 	plt.ylabel('intensity')
 
-	plt.plot(graphP_x, graphP_y, color = "#99CCFF", linestyle = 'none', marker = 'o', label = "1")
+	plt.plot(graphP_x, graphP_y, color = "#99CCFF", linestyle = 'none', marker = 'x', label = "1")
 	plt.plot(graphR_x, graphR_y, color = "#FF9999", linestyle = 'none', marker = 'x', label = "-1")
 
 	#train
-	plt.plot(x1, y1, 'bo', label='1')
-	plt.plot(xN, yN, 'ro', label='not 1')
+	#plt.plot(x1, y1, 'bo', label='1')
+	#plt.plot(xN, yN, 'rx', label='not 1')
 	#test
-	# plt.plot(t1, t2, 'bo', label='1')
-	# plt.plot(t3, t4, 'ro', label='not 1')
+	plt.plot(t1, t2, 'bo', label='1')
+	plt.plot(t3, t4, 'rx', label='not 1')
 
 	plt.show()
 

@@ -347,7 +347,7 @@ def handle(file):
 	plt.axis([x1beg, x1end, x2beg, x2end])
 
 	#part 1
-	NNPOS, NNNEG = makeGraph(7, x1beg, x1end, x2beg, x2end, 0.01, dataPOS, dataNEG)
+	NNPOS, NNNEG = makeGraph(11, x1beg, x1end, x2beg, x2end, 0.01, dataPOS, dataNEG)
 	plot(NNPOS, NNNEG, x1beg, x1end, x2beg, x2end)
 	#plotOG(dataPOS, dataNEG, x1beg, x1end, x2beg, x2end)
 
